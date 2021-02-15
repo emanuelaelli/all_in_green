@@ -1,0 +1,64 @@
+.intro {
+	text-align: center;
+}
+h6, h4, h1 {
+	color: green;
+	text-align: center;
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.parent {
+	text-align: center;
+}
+	
+.card{
+	padding: 20;
+	max-width: 25%;
+	max-height: 25%;
+	margin-left: 3%;
+	margin-right: 3%;
+	display: inline-block;
+	text-align: center;
+}
+
+.descrizione {
+	text-align: center;
+	margin-left: 20%;
+	margin-right: 20%;
+	margin-bottom: 2%;
+	font-size: 1.3em;
+	line-height: 2;
+	background-color: rgba(255, 255, 240, 0.529);
+
+}
+.sfondo {
+	margin-top: 1%;
+	margin-bottom: 5%;
+	background-image: url("https://www.ilviaggiochetimanca.com/media/cache/cover/uploads/travelogues/40bcd7e17e57ace5e19a7fed1ddb9dfe70f3b5fe.jpeg");
+	background-size: cover;
+}
+
+#ordina {
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: bold 20px Arial, Helvetica, sans-serif;
+	color: #fff;
+	padding: 10px 20px;
+	border: solid 1px green;
+	background: green;
+
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius: 8px;
+
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}	
+#ordina:hover {
+	background: #00a55d;
+}
+
+a { color: #008000; }
