@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- importo libreria per costruire i grafici -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+      .content {
+        margin-left: 3%; 
+        margin-bottom: 4%;
+      }
+    </style>
+
+
+</head>
+<body onload="">
+
+    <!-- NAVBAR -->    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+    <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="../html/homeR.html">Home</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+        </li>
+
+        <li class="nav-item active">
+            <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite<span class="sr-only">(current)</span></a>
+        </li>
+    </ul>
+    </div>
+    </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <center><img src="../img/statistiche.png"></center>
+
+    <div style="margin: 4%; color: #AD3B41; font-size: large;">
+      <center>Controlla le statistiche della tua attività per migliorare il tuo servizio.</center>
+    </div>
+  
+    <div class="row">
+      <div class="col-md-6">
+        <canvas id="myCanvas" ></canvas> <!-- stampo il grafico -->
+      </div>
+      <div class="col-md-6" >
+        <canvas id="myCanvas2" ></canvas>
+      </div>
+    </div>
+
+  <script>
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+    var ristorante_loggato=0;
+
+    // cerco quale utente è loggato
+    for (var i=0;i<vristoranti.length;i++) {
+        if (vristoranti[i].l==1) {
+            ristorante_loggato = i;
+        }
+    }
+
+    var annoAttuale = new Date().getFullYear();
+    var countLun = 0;
+    var countMart = 0;
+    var countMerc = 0;
+    var countGiov = 0;
+    var countVen = 0;
+    var countSab = 0;
+    var countDom = 0;
+    
+
+    for(i=0; i<vristoranti[ristorante_loggato].ordiniEffettuati.length; i++) {
+      var data = new Date(vristoranti[ristorante_loggato].ordiniEffettuati[i].anno + "/" 
+                          + vristoranti[ristorante_loggato].ordiniEffettuati[i].mese + "/" 
+                          + vristoranti[ristorante_loggato].ordiniEffettuati[i].giorno);              
+      
+      if (data.getFullYear() == annoAttuale) {
+        if(data.getDay() == 1) { //lunedì
+          countLun += 1;
+        } else if (data.getDay() == 2) {
+          countMart += 1;
+        } else if (data.getDay() == 3) {
+          countMerc += 1;
+        } else if (data.getDay() == 4) {
+          countGiov += 1;
+        } else if (data.getDay() == 5) {
+          countVen += 1;
+        } else if (data.getDay() == 6) {
+          countSab += 1;
+        } else if (data.getDay() == 0) {
+          countDom += 1;
+        }
+      }
+
+    }
+    
+    let myCanvas = document.getElementById("myCanvas").getContext('2d'); //configurazione canvas
+    let myLabels = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]; // etichette con i giorni della settimana
+    let myData = [countLun, countMart, countMerc, countGiov, countVen, countSab, countDom]; // numero di ordini al giorno 
+
+    myCanvas.canvas.width = 800;
+    myCanvas.canvas.height = 800;
+    
+    /// Global options
+    Chart.defaults.global.defaultFontFamily = 'Lato';
+    Chart.defaults.global.defaultFontSize = 20;
+    Chart.defaults.global.defaultFontColor = '#AD3B41';
+
+    let chart = new Chart(myCanvas, {
+        type: 'line',//'pie', //tipo di grafico che vogliamo
+        data: {
+            labels: myLabels, // IMPOSTARE CON I MIEI DATI
+            datasets: [{ // è un array di oggetti
+                label: "Numero di vendite giornaliere",
+                backgroundColor: '#90C744', 
+                borderColor: '#90C744', 
+                fill: false,
+                data: myData, // IMPOSTARE CON I MIEI DATI
+            }]
+
+        },
+        options: {
+          title: {
+              display: true,
+              text: 'Grafico delle vendite settimanali dell\'anno ' + annoAttuale, // titolo grafico
+              fontSize: 22, // grandezza font titolo
+              padding: 20
+          },
+          legend: {
+              display: true, // per visualizzare legenda
+              position: 'bottom' // di default è sopra
+          },
+          layout: {
+            padding: 50 // compare il grafico appena lo vedi  
+          },
+          tooltips: {
+              enable: true // fa vedere quando vai sopra il mouse la legendina
+          },
+          scales: {
+            xAxes: [{
+              display: true,
+            }],
+            yAxes: [{
+              display: true
+            }]
+          },
+          responsive: true,
+          maintainAspectRatio: true
+        }
+    });
+
+/////////////// SECONDO GRAFICO myCanvas2
+
+  var annoAttuale = new Date().getFullYear();
+  var countGen = 0;
+  var countFeb = 0;
+  var countMar = 0;
+  var countApr = 0;
+  var countMag = 0;
+  var countGiu = 0;
+  var countLug = 0;
+  var countAgo = 0;
+  var countSet = 0;
+  var countOtt = 0;
+  var countNov = 0;
+  var countDic = 0;
+
+  for(i=0; i<vristoranti[ristorante_loggato].ordiniEffettuati.length; i++) {
+    var data = new Date(vristoranti[ristorante_loggato].ordiniEffettuati[i].anno + "/" 
+                        + vristoranti[ristorante_loggato].ordiniEffettuati[i].mese + "/" 
+                        + vristoranti[ristorante_loggato].ordiniEffettuati[i].giorno);
+
+    if (data.getFullYear() == annoAttuale) {
+      if(data.getMonth() == 0) { //lunedì
+        countGen += 1;
+      } else if (data.getMonth() == 1) {
+        countFeb += 1;
+      } else if (data.getMonth() == 2) {
+        countMar += 1;
+      } else if (data.getMonth() == 3) {
+        countApr += 1;
+      } else if (data.getMonth() == 4) {
+        countMag += 1;
+      } else if (data.getMonth() == 5) {
+        countGiu += 1;
+      } else if (data.getMonth() == 6) {
+        countLug += 1;
+      } else if (data.getMonth() == 7) {
+        countAgo += 1;
+      } else if (data.getMonth() == 8) {
+        countSet += 1;
+      } else if (data.getMonth() == 9) {
+        countOtt += 1;
+      } else if (data.getMonth() == 10) {
+        countNov += 1;
+      } else if (data.getMonth() == 11) {
+        countDic += 1;
+      }
+    }
+
+  }
+  
+  let myCanvas2 = document.getElementById("myCanvas2").getContext('2d'); //configurazione canvas
+  let myLabels2 = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"]; // etichette con i giorni della settimana
+  let myData2 = [countGen, countFeb, countMar, countApr, countMag, countGiu, countLug, countAgo, countSet, countOtt, countNov, countDic]; // numero di ordini al giorno 
+
+  myCanvas2.canvas.width = 800;
+	myCanvas2.canvas.height = 800;
+
+  let crt = new Chart(myCanvas2, {
+      type: 'line',//'pie', //tipo di grafico che vogliamo
+      data: {
+          labels: myLabels2, // IMPOSTARE CON I MIEI DATI
+          datasets: [{ // è un array di oggetti
+              label: "Numero di vendite mensili",
+              backgroundColor: '#60BFE8', 
+              borderColor: '#60BFE8', 
+              fill: false,
+              data: myData2, // IMPOSTARE CON I MIEI DATI
+          }]
+
+      },
+      options: {
+          title: {
+              display: true,
+              text: 'Grafico delle vendite mensili dell\'anno ' + annoAttuale, // titolo grafico
+              fontSize: 22, // grandezza font titolo
+              padding: 20
+          },
+          legend: {
+              display: true, // per visualizzare legenda
+              position: 'bottom' // di default è sopra
+          },
+          layout: {
+              // padding: 50 // compare il grafico appena lo vedi
+              padding: {
+                  top: 50,
+                  bottom: 0
+              }
+          },
+          tooltips: {
+              enable: true // fa vedere quando vai sopra il mouse la legendina
+          },
+          scales: {
+            xAxes: [{
+              display: true,
+            }],
+            yAxes: [{
+              display: true
+              //type: 'logarithmic',
+            }]
+          }
+      }
+  });
+
+</script>
+
+  </div>
+
+    
+
+</body>
+</html>

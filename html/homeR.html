@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+      .menu {
+        padding-inline-start: 2%; 
+        padding-inline-end: 2%;
+      }
+      .profilo {
+        padding:1%;
+      }
+    </style>
+
+  <script type="text/javascript">
+
+///////////////////////// STAMPA DATI UTENTE
+
+  function stampaDatiUtente(){
+
+  // caricamento dati dal localStorage
+  var vristoranti = JSON.parse(localStorage.ristoranti);
+
+  var s = new String("");
+
+  for (i=0;i<vristoranti.length;i++){
+
+    if (vristoranti[i].l==1) {
+
+      s += "<div class='profilo'><strong>Email:</strong> " + vristoranti[i].e + "</div>";
+      s += "<div class='profilo'><strong>Password:</strong> ********" + "</div>";
+      s += "<div class='profilo'><strong>Nome del ristorante:</strong> " + vristoranti[i].nome + "</div>";
+      s += "<div class='profilo'><strong>Tipologia di ristorante:</strong> " + vristoranti[i].tipo + "</div>";
+      s += "<div class='profilo'><strong>Telefono:</strong> " + vristoranti[i].telefono + "</div>";
+      s += "<div class='profilo'><strong>Partita IVA:</strong> " + vristoranti[i].iva + "</div>";
+      s += "<div class='profilo'><strong>Indirizzo:</strong> " + vristoranti[i].indirizzo + ", " + vristoranti[i].citta + ", " + vristoranti[i].cap + "</div>";
+      s += "<br/>"
+      s += "<button onclick='modificaDati(" + i + ")'';' class='btn btn-raised' style='color: #377792; background-color: #98d4ee; width:100%;' ><span class='glyphicon glyphicon-calendar'></span><strong> Modifica i tuoi personali </strong></button><br/><br/>";
+
+    } // if
+
+  } // for
+
+  document.getElementById("vistaDatiUtente").innerHTML = s;
+
+  return true;
+
+}
+
+///////////////////////// REDIRECT ALLA MODIFICA DEL PROFILO RISTORANTE
+  function modificaDati(numero) {
+      window.location.href = "modificaDatiR.html?"+numero;
+  }
+
+///////////////////////// STAMPA MENU RISTORANTE
+
+  function stampaPrimi() {
+    // caricamento dati dal localStorage
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+    var s = new String("");
+    var controllo = 0;
+
+    for (i=0;i<vristoranti.length;i++){ // ciclo per trovare utente loggato
+
+      if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+        for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+          if (vristoranti[i].menu[j].categoria == "Primo") {
+            s+= "<strong>" + vristoranti[i].menu[j].nome + "</strong> ➔ "; 
+            for (p=0; p < vristoranti[i].menu[j].ingredienti.length; p++) {
+              if (p == vristoranti[i].menu[j].ingredienti.length - 1) {
+                s+= vristoranti[i].menu[j].ingredienti[p];
+              } else {
+                s+= vristoranti[i].menu[j].ingredienti[p]  + ", ";
+              }
+            }
+            s+= "</br>";
+            controllo = 1;
+          }
+
+        } // for
+
+      } // if
+
+    } // for
+
+    if (controllo==0) {
+      s+="<div class='alert alert-danger'> Nessun primo piatto in vendita :( </div>";
+    }
+
+    document.getElementById("vistaPrimi").innerHTML = s;
+
+    return true;
+
+  }
+
+  function stampaSecondi() {
+    // caricamento dati dal localStorage
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+    var s = new String("");
+    var controllo = 0;
+
+    for (i=0;i<vristoranti.length;i++){ // ciclo per trovare utente loggato
+
+      if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+        for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+          if (vristoranti[i].menu[j].categoria == "Secondo") {
+            s+= "<strong>" + vristoranti[i].menu[j].nome + "</strong> ➔ "; 
+            for (p=0; p < vristoranti[i].menu[j].ingredienti.length; p++) {
+              if (p == vristoranti[i].menu[j].ingredienti.length - 1) {
+                s+= vristoranti[i].menu[j].ingredienti[p];
+              } else {
+                s+= vristoranti[i].menu[j].ingredienti[p]  + ", ";
+              }
+            }
+            s+= "</br>";
+            controllo = 1;
+          }
+
+        } // for
+
+      } // if
+
+    } // for
+
+    if (controllo==0) {
+      s+="<div class='alert alert-danger'> Nessun secondo piatto in vendita :( </div>";
+    }
+
+    document.getElementById("vistaSecondi").innerHTML = s;
+
+    return true;
+
+  }
+
+  function stampaContorni() {
+    // caricamento dati dal localStorage
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+    var s = new String("");
+    var controllo = 0;
+
+    for (i=0;i<vristoranti.length;i++){ // ciclo per trovare utente loggato
+
+      if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+        for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+          if (vristoranti[i].menu[j].categoria == "Contorno") {
+            s+= "<strong>" + vristoranti[i].menu[j].nome + "</strong> ➔ "; 
+            for (p=0; p < vristoranti[i].menu[j].ingredienti.length; p++) {
+              if (p == vristoranti[i].menu[j].ingredienti.length - 1) {
+                s+= vristoranti[i].menu[j].ingredienti[p];
+              } else {
+                s+= vristoranti[i].menu[j].ingredienti[p]  + ", ";
+              }
+            }
+            s+= "</br>";
+
+            controllo = 1;
+          }
+
+        } // for
+
+      } // if
+
+    } // for
+
+    if (controllo==0) {
+      s+="<div class='alert alert-danger'> Nessun contorno in vendita :( </div>";
+    }
+
+    document.getElementById("vistaContorni").innerHTML = s;
+
+    return true;
+
+  }
+
+  function stampaPiattiUnici() {
+    // caricamento dati dal localStorage
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+    var s = new String("");
+    var controllo = 0;
+
+    for (i=0;i<vristoranti.length;i++){ // ciclo per trovare utente loggato
+
+      if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+        for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+          if (vristoranti[i].menu[j].categoria == "Piatto unico") {
+            s+= "<strong>" + vristoranti[i].menu[j].nome + "</strong> ➔ "; 
+            for (p=0; p < vristoranti[i].menu[j].ingredienti.length; p++) {
+              if (p == vristoranti[i].menu[j].ingredienti.length - 1) {
+                s+= vristoranti[i].menu[j].ingredienti[p];
+              } else {
+                s+= vristoranti[i].menu[j].ingredienti[p]  + ", ";
+              }
+            }
+            s+= "</br>";
+
+            controllo = 1;
+          }
+
+        } // for
+
+      } // if
+
+    } // for
+
+    if (controllo==0) {
+      s+="<div class='alert alert-danger'> Nessun piatto unico in vendita :( </div>";
+    }
+
+    document.getElementById("vistaPiattiUnici").innerHTML = s;
+
+    return true;
+
+  }
+
+  function stampaDolci() {
+    // caricamento dati dal localStorage
+    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+    var s = new String("");
+    var controllo = 0;
+
+    for (i=0;i<vristoranti.length;i++){ // ciclo per trovare utente loggato
+
+      if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+        for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+          if (vristoranti[i].menu[j].categoria == "Dolce") {
+            s+= "<strong>" + vristoranti[i].menu[j].nome + "</strong> ➔ "; 
+            for (p=0; p < vristoranti[i].menu[j].ingredienti.length; p++) {
+              if (p == vristoranti[i].menu[j].ingredienti.length - 1) {
+                s+= vristoranti[i].menu[j].ingredienti[p];
+              } else {
+                s+= vristoranti[i].menu[j].ingredienti[p]  + ", ";
+              }
+            }
+            s+= "</br>";
+
+            controllo = 1;
+          }
+
+        } // for
+
+      } // if
+
+    } // for
+
+    if (controllo==0) {
+      s+="<div class='alert alert-danger'> Nessun dolce in vendita :( </div>";
+    }
+
+    document.getElementById("vistaDolci").innerHTML = s;
+
+    return true;
+
+  }
+
+///////////////////////// ESCI ACCOUNT
+
+function esciAccount(){
+  
+  // caricamento dati dal localStorage
+  var vristoranti = JSON.parse(localStorage.ristoranti);
+
+  for (i=0;i<vristoranti.length;i++){
+
+    if (vristoranti[i].l==1) {
+
+      vristoranti[i].l=0;
+      localStorage.ristoranti = JSON.stringify(vristoranti);
+      alert("Uscita avvenuta con successo");
+      window.location.href = "homepage.html";
+      return true;
+
+    } // if
+
+  } // for
+
+}
+
+///////////////////////// CANCELLA ACCOUNT
+
+function cancellaAccount(){
+
+    var richiesta = confirm("Vuoi cancellare il tuo account?");
+      if (richiesta==true) {
+        //caricamento dati dal localStorage
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        //cerco utente loggato
+        for(var i=0; i<vristoranti.length;i++) {
+          if(vristoranti[i].l==1) {
+            var nomeristorante = new String(vristoranti[i].e);
+          }
+        }
+        // rimuovo i valori con splice()
+        for (var i=0; i<vristoranti.length; i++) {
+          if (vristoranti[i].e == nomeristorante) {
+            vristoranti.splice(i, 1); // splice (index, howmany)
+          }
+        }
+        // salvo i dati nel localStorage
+        localStorage.ristoranti = JSON.stringify(vristoranti);
+        alert("Cancellazione account avvenuta con successo!");
+        window.location.href = "homepage.html";
+        return false;
+      }
+  }
+
+///////////////////////// STAMPA NOME
+function stampaNomeUtente() {
+  // caricamento dati dal localStorage
+  var vristoranti = JSON.parse(localStorage.ristoranti);
+
+  var s = new String("");
+
+  for (i=0;i<vristoranti.length;i++){
+
+    if (vristoranti[i].l==1) {
+      s += " Ciao " + vristoranti[i].nome + "!";
+    }
+  }
+
+  document.getElementById("stampaNomeUtente").innerHTML = s;
+
+  return true;
+}
+
+
+</script>
+
+</head>
+<body onload="stampaDatiUtente(); stampaNomeUtente(); stampaPrimi(); stampaSecondi(); stampaContorni(); stampaPiattiUnici(); stampaDolci();">
+
+<!-- NAVBAR -->    
+<nav class="navbar navbar-expand-lg navbar-light bg-white">  
+  <a class="navbar-brand">
+    <img src="../img/logo.png" width="170" height="50" >
+  </a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="../html/homeR.html">Home <span class="sr-only">(current)</span></a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+      </li>
+  </ul>
+  </div>
+</nav>
+
+  <!-- //////////////// CONTENT -->
+
+  <div class="container">
+    <div class="panel-heading">
+    </br>
+      <h2><span class="glyphicon glyphicon-user"></span> <div id="stampaNomeUtente"></div></h2>
+    </br>
+    </div>
+    <div class="row">
+
+      <div class="col-md-6" style=" border: 1px #188a51 solid;">
+        <div class="panel panel-default"  >
+          <center><img src="../img/menu.png"></center>
+            <img src="../img/primi.png"></br>
+            <div id="vistaPrimi" class="menu"></div>
+            </br><img src="../img/secondi.png"></br>
+            <div id="vistaSecondi" class="menu"></div>
+            </br><img src="../img/contorni.png"></br>
+            <div id="vistaContorni" class="menu"></div>
+            </br><img src="../img/piattiUnici.png"></br>
+            <div id="vistaPiattiUnici" class="menu"></div>
+            </br><img src="../img/dolci.png"></br>
+            <div id="vistaDolci" class="menu"></div>
+
+            <div class="menu">
+            </br><button onclick='window.location.href = "modificaMenu.html";' class='btn btn-raised btn-success' style="width: 49%;"><span class='glyphicon glyphicon-calendar'></span> Modifica il tuo menu </button>
+            <button onclick='window.location.href = "creaPiatto.html";' class='btn btn-raised' style="color: #D88148; background-color: #FFDCBA; width: 49%; float: right;" ><span class='glyphicon glyphicon-calendar'></span><strong> Crea il tuo piatto! </strong></button></br></br>
+          </div>
+        </div>
+      </div> <!-- <div class="col-md-6"> -->
+
+      <div class="col-md-6">
+
+        <div class="panel panel-default" id="fissato" style=" padding:5px;margin:0 auto;border: 1px #188a51 solid; overflow: hidden;">
+          <div class="panel-body">
+            <div class="menu">
+              <img src="../img/ilTuoProfilo.png">
+              <div id="vistaDatiUtente"></div>
+              
+              <center><img src="../img/separatore.png" width="250"></center><br>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-block btn-success" onclick="esciAccount();" ><span class="glyphicon glyphicon-log-out"></span> Esci dall'account</button><br/>
+                </div>
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-block btn-danger" onclick="cancellaAccount();" ><span class="glyphicon glyphicon-trash"></span> Cancella Account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- <div class="panel-default"> -->
+      </div> <!-- <div class="col-md-6"> -->
+    </div> <!-- <div class="row"> -->
+  </div> <!-- <div class="container"> -->
+
+  </br>
+  </br>
+
+</body>
+</html>

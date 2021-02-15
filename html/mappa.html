@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css' />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+
+    <script src="https://unpkg.com/mapbox@1.0.0-beta9/dist/mapbox-sdk.min.js"></script>
+    <script>
+
+      var numeroRist;
+      function getFromUrl() {
+        var url, v;
+        url = document.location.href;
+        v = url.split("?");
+        numeroRist = v[1];
+
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        console.log(vristoranti)
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFydGl1bmkiLCJhIjoiY2tqeGIyOWhyMHFsazJ3bDd0aTNseWpyaSJ9.9NAI4QH-zIHK437MtTfQmw';
+        var client = new MapboxClient(mapboxgl.accessToken);
+
+        var address = vristoranti[numeroRist].indirizzo + " " + vristoranti[numeroRist].citta + " " + vristoranti[numeroRist].cap;
+        client.geocodeForward(address, function(err, data, res) { //stampa mappa centrata nel ristorante
+          //data is the geocoding result as parsed JSON
+          //res is the http response, including: status, headers and entity properties
+
+          var coordinates = data.features[0].center;
+
+          var map = new mapboxgl.Map({
+              container: "map",
+              style: "mapbox://styles/mapbox/streets-v10",
+              center: coordinates,
+              zoom: 14
+          });
+          new mapboxgl.Marker()
+          .setLngLat(coordinates)
+          .addTo(map);
+
+          console.log(coordinates)
+        });
+
+        //calcolo dei tempi
+        var vutenti = JSON.parse(localStorage.utenti);
+        var utente_loggato = 0;
+
+        //cerco quale utente è loggato
+        for (var i=0; i<vutenti.length; i++) {
+            if (vutenti[i].l == 1) {
+                utente_loggato = i;
+            }
+        }
+        var addressCliente = vutenti[utente_loggato].indirizzo + " " + vutenti[utente_loggato].citta + " " + vutenti[utente_loggato].cap;
+
+        var start;
+        var end ;
+
+        var prova = client.geocodeForward(address, function(err, data, res) {
+          //data is the geocoding result as parsed JSON
+          //res is the http response, including: status, headers and entity properties
+
+          start = data.features[0].center; // mi dà le coordinate del ristorante
+          console.log(start)
+
+          var prova2 = client.geocodeForward(addressCliente, function(err, data, res) {
+            //data is the geocoding result as parsed JSON
+            //res is the http response, including: status, headers and entity properties
+
+            end = data.features[0].center; //mi dà le coordinate di <rrivo 
+            console.log(end)
+
+            var url =
+              'https://api.mapbox.com/directions/v5/mapbox/cycling/' +
+              start[0] +
+              ',' +
+              start[1] +
+              ';' +
+              end[0] +
+              ',' +
+              end[1] +
+              '?steps=true&geometries=geojson&access_token=' +
+              mapboxgl.accessToken;
+
+            console.log(url)
+            console.log("Beginning");
+            var req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.onload = function() {
+              console.log("Inside");
+              var json = JSON.parse(req.response);
+              var data = json.routes[0];
+              var stampa = new String("");
+              
+
+              if (data.distance/1000 > 50) {
+                document.getElementById("imgConferma").innerHTML = "<center><img src='../img/ordineNONconfermato.png' width='480'></center>";
+
+                stampa += "Ci dispiace ma l'ordine non è stato effettuato perchè l'indirizzo di consegna supera la distanza massima di 50 km.";
+
+                var ultimaPosU = vutenti[utente_loggato].prenotazione.length-1;
+                vutenti[utente_loggato].prenotazione.splice(ultimaPosU,1); //splice(position,howmany)
+                var ultimaPosR = vristoranti[numeroRist].ordiniDaConfermare.length-1;
+                vristoranti[numeroRist].ordiniDaConfermare.splice(ultimaPosR,1); //splice(position,howmany)
+
+                localStorage.utenti = JSON.stringify(vutenti);
+                localStorage.ristoranti = JSON.stringify(vristoranti);
+
+              } else {
+                document.getElementById("imgConferma").innerHTML = "<center><img src='../img/ordineConcluso.png' id='imgConferma' width='480'></center>";
+                stampa+="Per essere più 'green' l'ordine ti verrà recapitato in bicicletta 🚲🍃<br><br><br>";
+
+                stampa+="La preparazione del tuo ordine richiede: " + vutenti[utente_loggato].prenotazione[vutenti[utente_loggato].prenotazione.length - 1].tempoelaborazione + " min <br>";
+                stampa+= "La consegna del tuo ordine richiede: " + Math.floor(data.duration / 60) + " min<br><br>";
+                var totale = Math.floor(data.duration / 60) + vutenti[utente_loggato].prenotazione[vutenti[utente_loggato].prenotazione.length - 1].tempoelaborazione;
+                stampa+= "Totale stima di consegna: " + totale + " min<br>";
+
+                //valuto i costi di consegna 2euro per km
+                var costiConsegna = Math.floor(data.distance/1000) * 2;
+                stampa+= "Totale costi di consegna: " + costiConsegna + " €";
+
+                
+
+                //aggiorno la prenotazione dell'utente
+                vutenti[utente_loggato].prenotazione[vutenti[utente_loggato].prenotazione.length - 1].totale = vutenti[utente_loggato].prenotazione[vutenti[utente_loggato].prenotazione.length - 1].totale + costiConsegna;
+                vutenti[utente_loggato].prenotazione[vutenti[utente_loggato].prenotazione.length - 1].tempoelaborazione = totale;
+                localStorage.utenti = JSON.stringify(vutenti);
+              }
+              document.getElementById("duration").innerHTML = stampa;
+
+            };
+              
+            console.log("Out");
+            req.send();
+                        
+          });
+          
+         });
+   
+      }  
+              
+    </script>
+
+  </head>
+
+  <body onload="getFromUrl();">
+    <!-- NAVBAR -->   
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+      <a class="navbar-brand">
+          <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        
+            <li class="nav-item">
+            <a class="nav-link" href="../html/homeU.html">Home</a>
+            </li>
+
+            <li class="nav-item active">
+            <a class="nav-link" href="../html/scegliRistoranteU.html">Ordina ora<span class="sr-only">(current)</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+                </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div id="imgConferma" style="margin-bottom: 1%;"></div>
+    
+    <div class="container">
+      <div class="row" style="height: 600px; margin-bottom: 5%;">
+
+          <div class="col-md-6">
+            <div id='map' ></div>
+
+          </div> 
+          <div class="col-md-6">
+            <div style="margin-top: 50%; margin-left: 5%; margin-bottom: 50%;">
+              <center><h5 id="duration"></h5></center>
+              <button type="submit" onclick="window.location.href='homeU.html'" class="btn btn-raised" style="color: #1f7518; background-color: #a0e9a0; width: 100%; float: right; font-weight: bold;" > Torna alla home </button>
+            </div>
+          </div>
+          
+      </div>
+  </div>
+
+    
+  </body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <!-- titolo e logo della pagina -->
+        <title>All in Green</title>
+        <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+        <script>
+
+            function inizializzaStorageUtenti() {
+                if (typeof(localStorage.utenti)=="undefined") {
+                    localStorage.utenti="[]";
+                }
+            }
+
+
+    //PRENOTA IL RISTORANTE SCELTO
+
+            function prenotaRistorante(i) {
+                window.location.href="prenotazioneU.html?"+i;
+            }
+
+
+    //STAMPA DEI RISTORANTI
+
+            function stampaRistoranti() {
+                if (typeof(localStorage.ristoranti)=="undefined") {
+                    localStorage.setItem("ristoranti", JSON.stringify(ristoranti));  
+                }
+
+                //caricamento dati dal localStorage
+                var vristoranti = JSON.parse(localStorage.getItem("ristoranti"));
+
+                //stampa dei ristoranti
+                var s = new String("<center><img src='../img/tuttiIRistoranti.png' width='380'></center>");
+
+                if (vristoranti=="") {
+                    s+="<br><div class='alert alert-danger'><center>Nessun ristorante registrato!</center></div>";
+                } else {
+                    for (i=0; i<vristoranti.length; i++) {
+                        s+="<br><div class='card-header' style='border:1.5px #1466ff solid; border-radius: 5px;'>";
+                        s+="<div class='row'>";
+                            s+="<div class='col-md-6' style='color:#1466ff;'><strong>"+vristoranti[i].nome+"</strong></div>";
+                            s+="<div class='col-md-6'><div align='right'><button type='submit' class='btn btn-primary btn-sm' onclick='prenotaRistorante("+i+")'><span class='glyphicon glyphicon-calendar'></span> Scegli</button></div></div>";
+                            s+="<div class='col-md-12'><p class='card-text'><strong>Indirizzo</strong>: "+vristoranti[i].indirizzo+", "+vristoranti[i].citta+", "+vristoranti[i].cap+"<br><strong>Tipologia</strong>: "+vristoranti[i].tipo+"</p></div>";
+                        s+="</div></div>"; 
+                    }
+                }                           
+                document.getElementById("ristorante").innerHTML=s;
+            }
+
+
+    //RICERCA DEI RISTORANTI
+
+            function ricercaRistoranti() {
+                if (true) {
+                    //prendo il nome del ristorante
+                    var nomeris = new String("");
+                    nomeris = document.cercaristorante.nomeristorante;
+
+                    //prendo il tipo di ristorante
+                    var tiporis = new String("");
+                    for (j=0; j<document.cercaristorante.tiporistorante.length; j++) {
+                        if (document.cercaristorante.tiporistorante[j].checked) {
+                            tiporis += document.cercaristorante.tiporistorante[j].value;
+                        }
+                    }
+
+                    //caricamento dati dal localStorage
+                    var vristoranti = JSON.parse(localStorage.getItem("ristoranti"));
+
+                    //variabili per la ricerca
+                    var x, z, controllo=0;
+                    var s = new String("<center><img src='../img/risultatiDellaRicerca.png' width='490'></center>");
+
+                    for (i=0; i<vristoranti.length; i++) {
+                        x = true; //per nomeris
+                        z = true; //per tiporis
+
+                        //controllo se l'utente ha inserito qualcosa nel campo nome
+                        if (document.cercaristorante.nomeristorante.value=="") {
+                            nomeris = true;
+                        } else {
+                            nomeris = document.cercaristorante.nomeristorante.value;
+                        }
+                        
+                        if (tiporis=="") {
+                            tiporis = true;
+                        }
+
+                        //se l'utente ha inserito qualcosa, controllo che sia uguale al campo in posizione i
+                        if (nomeris!=true) {
+                            x = RegExp(nomeris, "ig").test(vristoranti[i].nome);
+                        }
+                        if (tiporis!=true) {
+                            z = (tiporis==vristoranti[i].tipo);
+                        }
+
+                        //se tutti i valori sono veri, allora stampo il ristorante
+                        if ( nomeris && x && tiporis && z) {
+                            s+="<br><div class='card-header' style='border:1.5px #1466ff solid; border-radius: 5px;'>";
+                            s+="<div class='row'>";
+                                s+="<div class='col-md-6' style='color:#1466ff;'><strong>"+vristoranti[i].nome+"</strong></div>";
+                                s+="<div class='col-md-6'><div align='right'><button type='submit' class='btn btn-primary btn-sm' onclick='prenotaRistorante("+i+")'><span class='glyphicon glyphicon-calendar'></span> Scegli</button></div></div>";
+                                s+="<div class='col-md-12'><p class='card-text'><strong>Indirizzo</strong>: "+vristoranti[i].indirizzo+", "+vristoranti[i].citta+", "+vristoranti[i].cap+"<br><strong>Tipologia</strong>: "+vristoranti[i].tipo+"</p></div>";
+                            s+="</div></div>"; 
+                            controllo=1;
+                        } 
+                    } 
+
+                    if (controllo==0) {
+                        s+="<br><div class='alert alert-danger'><center>Nessun risultato trovato!</center></div>";
+                    }
+
+                    document.getElementById("ristorante").innerHTML = s;
+                    return false;
+
+                } else {
+                    return true;
+                }
+            }
+
+        </script>
+    </head>
+  
+    <body onload="stampaRistoranti();">
+
+        <!-- NAVBAR -->
+            
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">  <!-- bg-white per avere sfondo bianco -->
+            <a class="navbar-brand">
+                <img src="../img/logo.png" width="170" height="50" >
+            </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" >
+            <ul class="navbar-nav mr-auto">
+            
+            <li class="nav-item">
+                <a class="nav-link" href="../html/homeU.html">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link active" href="../html/scegliRistoranteU.html">Ordina ora<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+              </li>
+            </ul>
+        </div>
+        </nav>
+
+        <!-- DATI -->
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">   
+                    <div id="ristorante"></div>  
+                </div> 
+            
+                <div class="col-md-6">
+                    <div class="panel panel-default" id="fissato">
+                        <div class="panel-heading">
+                            <center><img src="../img/ricercaRistorante.png" width="380"></center><br>
+                        </div>
+                    
+                        <div class="panel-body">
+                            <form action="" method="post" name="cercaristorante" onSubmit="return ricercaRistoranti();" accept-charset="utf-8">
+                                <!-- RICERCA PER NOME -->
+                                <div class="form-group">
+                                    <h5>Nome del ristorante</h5>
+                                    <input type="text" placeholder="Nome del ristorante" name="nomeristorante" value="" class="form-control">
+                                </div><br>
+                                
+                                <!-- RICERCA PER TIPO -->
+                                <div class="form-group">
+                                    <h5>Tipo di ristorante</h5>
+                                    <div class="radio">
+                                        <label class="radio-inline"><input type="radio" name="tiporistorante" value="fitfood"> Fitfood</label><br>
+                                        <label class="radio-inline"><input type="radio" name="tiporistorante" value="hamburgeria"> Hamburgeria</label><br>
+                                        <label class="radio-inline"><input type="radio" name="tiporistorante" value="cucina orientale"> Cucina orientale</label><br>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <button type="submit" class="btn btn-success btn-block" ><span class="glyphicon glyphicon-search"></span>Cerca</button>
+                                    </div>
+                                </div>
+                            </form><br>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form method="post" name="annulla" onsubmit="return stampaRistoranti();" ><button type='submit' class='btn btn-block btn-danger'><span class="glyphicon glyphicon-remove"></span> Annulla e vedi TUTTI i ristoranti</button></form>        
+                                </div>
+                            </div>
+                        </div> <!-- <div class="panel-body"> -->
+                    </div> <!-- <div class="panel-default"> -->
+                </div> <!-- <div class="col-md-6"> -->
+            </div> <!-- <div class="row"> -->
+        </div> <!-- <div class="container"> -->
+    </body>
+</html>

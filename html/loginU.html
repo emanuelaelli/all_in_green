@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <style>
+      label.label {
+        color: #f47421;
+        font-size: large;
+        font-weight:bold;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+  //INIZIALIZZAZIONE DEL LOCAL STORAGE DEGLI UTENTI
+
+      function inizializzaStorageUtenti(){
+        if (typeof(localStorage.utenti) == "undefined") {
+          localStorage.utenti="[]";
+        }
+      }
+
+  //CONTROLLO LOGIN
+
+      function checkLogin(){
+
+        //caricamento dati da localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+
+        for (i=0; i<vutenti.length; i++) {
+          if (vutenti[i].l==1) {
+            window.location.href = "homeU.html";
+          }
+        }
+      }
+
+  //VERIFICA DEI DATI INSERITI
+
+      function uguali_psw(vutenti,datiform) {
+        if ((vutenti.nc==datiform.nc)&&(vutenti.p==datiform.p)) { //se email e pw sono corretti accedi
+          return true;
+        }
+        return false;
+      }
+
+  //LOGIN UTENTE
+
+      function loginUtente() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+
+        //dati inseriti nella form
+        var datiform = {
+          nc:document.login.email.value,
+          p:document.login.password.value
+        };
+
+        for (i=0;i<vutenti.length;i++) {
+
+          //se i dati inseriti combaciano con un utente salvato nel local storage
+          if(uguali_psw(vutenti[i],datiform)) {
+
+            vutenti[i].l = 1; //imposto il login a 1 così so che è dentro
+            localStorage.utenti = JSON.stringify(vutenti); //trasformo e invio al local storage
+
+            window.location.href = "homeU.html";
+            return true;
+          } 
+        } 
+        alert("I dati inseriti NON sono corretti.");
+        return false;
+      }
+
+    </script>
+  </head>
+
+  <body onload="inizializzaStorageUtenti(); checkLogin()">
+
+    <!-- NAVBAR -->
+          
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  <!-- bg-white per avere sfondo bianco -->
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../html/homepage.html">Home</a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="../html/presentazione.html">Chi siamo</a>
+          </li>
+                      
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Registrati qui!
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="../html/registrazioneU.html" style="color: #f47421;">Cliente</a>
+              <a class="dropdown-item" href="../html/registrazioneR.html" style="color: #4E9CBD;">Ristorante</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown active">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Accedi<span class="sr-only">(current)</span>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="../html/loginU.html" style="color: #f47421;">Cliente</a>
+              <a class="dropdown-item" href="../html/loginR.html" style="color: #4E9CBD;">Ristorante</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- LOGIN UTENTE -->
+
+    <center><img src="../img/loginU.png" width="600"></center>
+
+    <center><div class="col-md-5">
+
+      <div class="panel panel-default">
+
+        <div class="panel-body">
+          <form action="" method="post" name="login" onSubmit="return loginUtente();">
+
+            <div class="form-group" style="text-align: left;">
+              <label class="label">Email:</label>
+              <input class="form-control" type="email" name="email" required="">
+            </div>
+
+            <div class="form-group" style="text-align: left;">
+              <label class="label">Password:</label>
+              <input class="form-control" type="password" name="password" required="">
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-block btn-light" style="background-color:#f47421; color: white;">Accedi<span class="glyphicon glyphicon-log-in"></span></button><br/>
+            </div>
+
+          </form>
+        </div> 
+
+      </div> 
+      <a href="registrazioneU.html" style="color: #f47421;">Non hai un account? Registrati qui!</a>
+
+    </div></center><br>
+
+  </body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <!-- Per il funzionamento dell'accordion -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+    <!-- <script src="../json/piatti.json"></script> -->
+
+    <style type="text/css">
+      a.stylish-button {
+        color:white;
+        background-color:#03b5f0;
+        border-radius:5px;
+        -moz-border-radius:5px;
+        -webkit-border-radius:5px;
+        border:none;
+        font-size:16px;
+        padding:9px 42px;
+      }
+
+      .btn-group button {
+        background-color: #ffefd5; /* Green background */
+        border: 1px solid #ffdab9; /* Green border */
+        color: black; /* White text */
+        padding: 10px 24px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        float: left; /* Float the buttons side by side */
+      }
+
+      /* Clear floats (clearfix hack) */
+      .btn-group:after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+
+      .btn-group button:not(:last-child) {
+        border-right: none; /* Prevent double borders */
+      }
+
+      /* Add a background color on hover */
+      .btn-group button:hover {
+        background-color: #ffdab9;
+      }  
+
+    </style>
+
+
+    <script type="text/javascript">
+
+      var idmis;
+      var nomeCategoria;
+      var numero;
+      var ingr = new Array();
+
+///////////////////////// CARICAMENTO PIATTI
+      var vpiatti;
+      var url = 'https://raw.githubusercontent.com/emanuelaelli/all_in_green/main/piatti.json';
+      var req = new XMLHttpRequest();
+      req.overrideMimeType("application/json");
+      req.open('GET', url, true);
+      req.onload  = function() {
+        var jsonResponse = JSON.parse(req.responseText);
+        console.log(jsonResponse);
+        //salvo tutti i piatti
+        vpiatti = JSON.parse(req.responseText);
+      };
+      req.send();
+
+///////////////////////// STAMPA PIATTI DA AGGIUNGERE AL MENU
+
+      function stampaListaPiatti(nomeCategoria){
+
+        /*
+        if (typeof(localStorage.piatti) == "undefined") {
+          localStorage.setItem("piatti", JSON.stringify(piatti));  
+        }
+
+        // caricamento dati dal localStorage
+        var vpiatti = JSON.parse(localStorage.getItem("piatti"));
+        */
+
+        var s = new String("");
+
+        //PRIMI
+        for (i=0; i<vpiatti.length; i++) {
+          if (nomeCategoria=="Primo" && vpiatti[i].categoria=="Primo") {
+            s+="</br><div class='row'> <div class='col-md-12 col-xs-12'>";
+            s+="<div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'><strong>"+vpiatti[i].nome+"</strong></h3></div><div class='panel-body'><div class='row'><div class='col-md-6'><strong>Categoria</strong>: "+vpiatti[i].categoria+"<br/>";
+            s+="<strong>Ingredienti:</strong><br/>";
+            for (j=0; j<vpiatti[i].ingredienti.length; j++) {
+              s+= "&nbsp; • &nbsp;" + vpiatti[i].ingredienti[j] + "<br/>";
+            }
+            s+="<br/><div class='panel-footer'><button type='submit' class='btn btn-success' onclick='aggiungiPiattoAMenu("+ i +")'><span class='glyphicon glyphicon-calendar'></span> Aggiungi al tuo menu </button></div></div>";
+            s+="<div class='col-md-6'><img class='img' src='" + vpiatti[i].foto + "' width='250' style='padding:0px 15px;'></div></div>";
+            s+="<hr>";  
+            s+="</div></div>";
+          }
+        }
+
+        //SECONDI
+        for (i=0; i<vpiatti.length; i++) {
+          if (nomeCategoria=="Secondo" && vpiatti[i].categoria=="Secondo") {
+            s+="</br><div class='row'> <div class='col-md-12 col-xs-12'>";
+            s+="<div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'><strong>"+vpiatti[i].nome+"</strong></h3></div><div class='panel-body'><div class='row'><div class='col-md-6'><strong>Categoria</strong>: "+vpiatti[i].categoria+"<br/>";
+              s+="<strong>Ingredienti:</strong><br/>";
+            for (j=0; j<vpiatti[i].ingredienti.length; j++) {
+              s+= "&nbsp; • &nbsp;" + vpiatti[i].ingredienti[j] + "<br/>";
+            }
+            s+="</br><div class='panel-footer'><button type='submit' class='btn btn-success' onclick='aggiungiPiattoAMenu("+ i +")'><span class='glyphicon glyphicon-calendar'></span> Aggiungi al tuo menu </button></div></div>";
+            s+="<div class='col-md-6'><img class='img-rounded' src='" + vpiatti[i].foto + "' width='250' style='padding:0px 15px;' ></div></div>";
+            s+="<hr>";  
+            s+="</div></div>";
+          }
+        } 
+
+        //CONTORNI
+        for (i=0; i<vpiatti.length; i++) {
+          if (nomeCategoria=="Contorno" && vpiatti[i].categoria=="Contorno") {
+            s+="</br><div class='row'> <div class='col-md-12 col-xs-12'>";
+            s+="<div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'><strong>"+vpiatti[i].nome+"</strong></h3></div><div class='panel-body'><div class='row'><div class='col-md-6'><strong>Categoria</strong>: "+vpiatti[i].categoria+"<br/>";
+            s+="<strong>Ingredienti:</strong><br/>";
+            for (j=0; j<vpiatti[i].ingredienti.length; j++) {
+              s+= "&nbsp; • &nbsp;" + vpiatti[i].ingredienti[j] + "<br/>";
+            }
+            s+="</br><div class='panel-footer'><button type='submit' class='btn btn-success' onclick='aggiungiPiattoAMenu("+ i +")'><span class='glyphicon glyphicon-calendar'></span> Aggiungi al tuo menu </button></div></div>";
+            s+="<div class='col-md-6'><img class='img-rounded' src='" + vpiatti[i].foto + "' width='250' style='padding:0px 15px;'></div></div>";
+            s+="<hr>";  
+            s+="</div></div>";
+          }
+        } 
+
+        //PIATTI UNICI
+        for (i=0; i<vpiatti.length; i++) {
+          if (nomeCategoria=="Piatto unico" && vpiatti[i].categoria=="Piatto unico") {
+            s+="</br><div class='row'> <div class='col-md-12 col-xs-12'>";
+            s+="<div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'><strong>"+vpiatti[i].nome+"</strong></h3></div><div class='panel-body'><div class='row'><div class='col-md-6'><strong>Categoria</strong>: "+vpiatti[i].categoria+"<br/>";
+            s+="<strong>Ingredienti:</strong><br/>";
+            for (j=0; j<vpiatti[i].ingredienti.length; j++) {
+              s+= "&nbsp; • &nbsp;" + vpiatti[i].ingredienti[j] + "<br/>";
+            }
+            s+="</br><div class='panel-footer'><button type='submit' class='btn btn-success' onclick='aggiungiPiattoAMenu("+ i +")'><span class='glyphicon glyphicon-calendar'></span> Aggiungi al tuo menu </button></div></div>";
+            s+="<div class='col-md-6'><img class='img-rounded' src='" + vpiatti[i].foto + "' width='250' style='padding:0px 15px;'></div></div>";
+            s+="<hr>";  
+            s+="</div></div>";
+          }
+        } 
+
+        //DOLCI
+        for (i=0; i<vpiatti.length; i++) {
+          if (nomeCategoria=="Dolce" && vpiatti[i].categoria=="Dolce") {
+            s+="</br><div class='row'> <div class='col-md-12 col-xs-12'>";
+            s+="<div class='panel panel-default'><div class='panel-heading'><h3 class='panel-title'><strong>"+vpiatti[i].nome+"</strong></h3></div><div class='panel-body'><div class='row'><div class='col-md-6'><strong>Categoria</strong>: "+vpiatti[i].categoria+"<br/>";
+            s+="<strong>Ingredienti:</strong><br/>";
+            for (j=0; j<vpiatti[i].ingredienti.length; j++) {
+              s+= "&nbsp; • &nbsp;" + vpiatti[i].ingredienti[j] + "<br/>";
+            }
+            s+="</br><div class='panel-footer'><button type='submit' class='btn btn-success' onclick='aggiungiPiattoAMenu("+ i +")'><span class='glyphicon glyphicon-calendar'></span> Aggiungi al tuo menu </button></div></div>";
+            s+="<div class='col-md-6'><img class='img-rounded' src='" + vpiatti[i].foto + "' width='250' style='padding:0px 15px;' ></div></div>";
+            s+="<hr>";  
+            s+="</div></div>";
+          }
+        }
+
+        document.getElementById("listaPiatti").innerHTML = s;
+      }
+
+///////////////////////// STAMPA MENU RISTORANTE
+
+      function stampaPrimi() {
+
+          // caricamento dati dal localStorage
+          var vristoranti = JSON.parse(localStorage.ristoranti);
+
+          var s = new String("");
+          var controllo = 0;
+
+          for (i=0; i<vristoranti.length; i++){ //ciclo per trovare ristorante loggato
+
+            if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+              for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+                if (vristoranti[i].menu[j].categoria == "Primo") {
+
+                  s+= "<div style='font-size:large;'><strong>" + vristoranti[i].menu[j].nome + "</strong></div>";
+                  //RIEPILOGO PIATTO
+                  s+="<div style='width: 100%; border: 1px #188a51 solid; ' >";
+                  s+="<div class='collapsed card-header'>";
+                  s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+j+"'>";
+                  s+="<div style='color: #188a51; font-size: small;'><strong><center>RIEPILOGO PIATTO:<img src='../img/espandiElenco.png' style='width:3%;' align=right></center></strong></div>";                s+="</a>";
+                  s+="</div>"; 
+                  s+="<div id='collapse"+j+"' class='collapse'>";
+                  s+="<div class='card-body'>";
+                  s += "<strong> Nome: </strong>" + vristoranti[i].menu[j].nome + "<br>";
+                  s += "<strong> Categoria: </strong>" + vristoranti[i].menu[j].categoria + "<br>";
+                  s += "<strong> Prezzo: </strong>" + vristoranti[i].menu[j].prezzo + " €<br>";
+                  s += "<strong> Ingredienti: </strong><br>";
+                  for (p=0; p<vristoranti[i].menu[j].ingredienti.length; p++) {
+                    s+= "&nbsp; • &nbsp;" + vristoranti[i].menu[j].ingredienti[p] + "<br/>";
+                  }
+                  s+="</div> </div> </div><br><div>";
+
+                  s+="<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:200px;' onclick='cancellaPiatto(" + j + ");'> Cancella piatto dal menu </button> </div>";
+                  s+="<div style='float:right; padding-right: 2%'><button type='submit' class='btn btn-success btn-sm btn-icon' style='width:200px;' onclick='modificaPiatto(" + j + ");'> Modifica piatto </button> </div>";
+                  
+                  s+="<br>"; 
+                  s+="<hr>";
+                  controllo = 1;
+                }
+
+              } // for
+            } // if
+          } // for
+
+          if (controllo==0) {
+            s+="<div class='alert alert-danger'> Nessun primo piatto in vendita :( </div>";
+          }
+
+          document.getElementById("vistaPrimi").innerHTML = s;
+          return true;
+        }
+
+      function stampaSecondi() {
+
+          // caricamento dati dal localStorage
+          var vristoranti = JSON.parse(localStorage.ristoranti);
+
+          var s = new String("");
+          var controllo = 0;
+
+          for (i=0; i<vristoranti.length; i++){ //ciclo per trovare ristorante loggato
+
+            if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+              for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+                if (vristoranti[i].menu[j].categoria == "Secondo") {
+                  s+= "<div style='font-size:large;'><strong>" + vristoranti[i].menu[j].nome + "</strong></div>";
+                  //RIEPILOGO PIATTO
+                  s+="<div style='width: 100%; border: 1px #188a51 solid;'>";
+                  s+="<div class='collapsed card-header'>";
+                  s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+j+"'>";
+                  s+="<div style='color: #188a51; font-size: small;'><strong><center>RIEPILOGO PIATTO:<img src='../img/espandiElenco.png' style='width:3%;' align=right></center></strong></div>";                s+="</a>";
+                  s+="</div>"; 
+                  s+="<div id='collapse"+j+"' class='collapse'>";
+                  s+="<div class='card-body'>";
+                  s += "<strong> Nome: </strong>" + vristoranti[i].menu[j].nome + "<br>";
+                  s += "<strong> Categoria: </strong>" + vristoranti[i].menu[j].categoria + "<br>";
+                  s += "<strong> Prezzo: </strong>" + vristoranti[i].menu[j].prezzo + " €<br>";
+                  s += "<strong> Ingredienti: </strong><br>";
+                  for (p=0; p<vristoranti[i].menu[j].ingredienti.length; p++) {
+                    s+= "&nbsp; • &nbsp;" + vristoranti[i].menu[j].ingredienti[p] + "<br/>";
+                  }
+                  s+="</div> </div> </div><br><div>";
+
+                  s+="<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:200px;' onclick='cancellaPiatto(" + j + ");'> Cancella piatto dal menu </button> </div>";
+                  s+="<div style='float:right; padding-right: 2%'><button type='submit' class='btn btn-success btn-sm btn-icon' style='width:200px;' onclick='modificaPiatto(" + j + ");'> Modifica piatto </button> </div>";
+                  
+                  s+="<br>"; 
+                  s+="<hr>";
+                  controllo = 1;            
+                }
+
+              } // for
+            } // if
+          } // for
+
+          if (controllo==0) {
+            s+="<div class='alert alert-danger'> Nessun secondo piatto in vendita :( </div>";
+          }
+
+          document.getElementById("vistaSecondi").innerHTML = s;
+          return true;
+        }
+
+      function stampaContorni() {
+
+          //caricamento dati dal localStorage
+          var vristoranti = JSON.parse(localStorage.ristoranti);
+
+          var s = new String("");
+          var controllo = 0;
+
+          for (i=0; i<vristoranti.length; i++){ //ciclo per trovare ristorante loggato
+
+            if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+              for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+                if (vristoranti[i].menu[j].categoria == "Contorno") {
+                  s+= "<div style='font-size:large;'><strong>" + vristoranti[i].menu[j].nome + "</strong></div>";
+                  //RIEPILOGO PIATTO
+                  s+="<div style='width: 100%; border: 1px #188a51 solid;'>";
+                  s+="<div class='collapsed card-header'>";
+                  s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+j+"'>";
+                  s+="<div style='color: #188a51; font-size: small;'><strong><center>RIEPILOGO PIATTO:<img src='../img/espandiElenco.png' style='width:3%;' align=right></center></strong></div>";                s+="</a>";
+                  s+="</div>"; 
+                  s+="<div id='collapse"+j+"' class='collapse'>";
+                  s+="<div class='card-body'>";
+                  s += "<strong> Nome: </strong>" + vristoranti[i].menu[j].nome + "<br>";
+                  s += "<strong> Categoria: </strong>" + vristoranti[i].menu[j].categoria + "<br>";
+                  s += "<strong> Prezzo: </strong>" + vristoranti[i].menu[j].prezzo + " €<br>";
+                  s += "<strong> Ingredienti: </strong><br>";
+                  for (p=0; p<vristoranti[i].menu[j].ingredienti.length; p++) {
+                    s+= "&nbsp; • &nbsp;" + vristoranti[i].menu[j].ingredienti[p] + "<br/>";
+                  }
+                  s+="</div> </div> </div><br><div>";
+
+                  s+="<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:200px;' onclick='cancellaPiatto(" + j + ");'> Cancella piatto dal menu </button> </div>";
+                  s+="<div style='float:right; padding-right: 2%'><button type='submit' class='btn btn-success btn-sm btn-icon' style='width:200px;' onclick='modificaPiatto(" + j + ");'> Modifica piatto </button> </div>";
+                  
+                  s+="<br>"; 
+                  s+="<hr>";
+                  controllo = 1;            
+                }
+
+              } // for
+            } // if
+          } // for
+
+          if (controllo==0) {
+            s+="<div class='alert alert-danger'> Nessun contorno in vendita :( </div>";
+          }
+
+          document.getElementById("vistaContorni").innerHTML = s;
+          return true;
+        }
+
+      function stampaPiattiUnici() {
+
+          //caricamento dati dal localStorage
+          var vristoranti = JSON.parse(localStorage.ristoranti);
+
+          var s = new String("");
+          var controllo = 0;
+
+          for (i=0; i<vristoranti.length; i++){ //ciclo per trovare ristorante loggato
+
+            if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+              for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+                if (vristoranti[i].menu[j].categoria == "Piatto unico") {
+                  s+= "<div style='font-size:large;'><strong>" + vristoranti[i].menu[j].nome + "</strong></div>";
+                  //RIEPILOGO PIATTO
+                  s+="<div style='width: 100%; border: 1px #188a51 solid;'>";
+                  s+="<div class='collapsed card-header'>";
+                  s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+j+"'>";
+                  s+="<div style='color: #188a51; font-size: small;'><strong><center>RIEPILOGO PIATTO:<img src='../img/espandiElenco.png' style='width:3%;' align=right></center></strong></div>";                s+="</a>";
+                  s+="</div>"; 
+                  s+="<div id='collapse"+j+"' class='collapse'>";
+                  s+="<div class='card-body'>";
+                  s += "<strong> Nome: </strong>" + vristoranti[i].menu[j].nome + "<br>";
+                  s += "<strong> Categoria: </strong>" + vristoranti[i].menu[j].categoria + "<br>";
+                  s += "<strong> Prezzo: </strong>" + vristoranti[i].menu[j].prezzo + " €<br>";
+                  s += "<strong> Ingredienti: </strong><br>";
+                  for (p=0; p<vristoranti[i].menu[j].ingredienti.length; p++) {
+                    s+= "&nbsp; • &nbsp;" + vristoranti[i].menu[j].ingredienti[p] + "<br/>";
+                  }
+                  s+="</div> </div> </div><br><div>";
+
+                  s+="<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:200px;' onclick='cancellaPiatto(" + j + ");'> Cancella piatto dal menu </button> </div>";
+                  s+="<div style='float:right; padding-right: 2%'><button type='submit' class='btn btn-success btn-sm btn-icon' style='width:200px;' onclick='modificaPiatto(" + j + ");'> Modifica piatto </button> </div>";
+                  
+                  s+="<br>"; 
+                  s+="<hr>";
+                  controllo = 1;            
+                }
+
+              } // for
+            } // if
+          } // for
+
+          if (controllo==0) {
+            s+="<div class='alert alert-danger'> Nessun piatto unico in vendita :( </div>";
+          }
+
+          document.getElementById("vistaPiattiUnici").innerHTML = s;
+          return true;
+        }
+
+      function stampaDolci() {
+
+          //caricamento dati dal localStorage
+          var vristoranti = JSON.parse(localStorage.ristoranti);
+
+          var s = new String("");
+          var controllo = 0;
+
+          for (i=0; i<vristoranti.length; i++){ //ciclo per trovare ristorante loggato
+
+            if (vristoranti[i].l==1 && vristoranti[i].menu.length != 0) {
+              for (j=0; j<vristoranti[i].menu.length; j++) { 
+
+                if (vristoranti[i].menu[j].categoria == "Dolce") {
+                  s+= "<div style='font-size:large;'><strong>" + vristoranti[i].menu[j].nome + "</strong></div>";
+                  //RIEPILOGO PIATTO
+                  s+="<div style='width: 100%; border: 1px #188a51 solid;'>";
+                  s+="<div class='collapsed card-header'>";
+                  s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+j+"'>";
+                  s+="<div style='color: #188a51; font-size: small;'><strong><center>RIEPILOGO PIATTO:<img src='../img/espandiElenco.png' style='width:3%;' align=right></center></strong></div>";                s+="</a>";
+                  s+="</div>"; 
+                  s+="<div id='collapse"+j+"' class='collapse'>";
+                  s+="<div class='card-body'>";
+                  s += "<strong> Nome: </strong>" + vristoranti[i].menu[j].nome + "<br>";
+                  s += "<strong> Categoria: </strong>" + vristoranti[i].menu[j].categoria + "<br>";
+                  s += "<strong> Prezzo: </strong>" + vristoranti[i].menu[j].prezzo + " €<br>";
+                  s += "<strong> Ingredienti: </strong><br>";
+                  for (p=0; p<vristoranti[i].menu[j].ingredienti.length; p++) {
+                    s+= "&nbsp; • &nbsp;" + vristoranti[i].menu[j].ingredienti[p] + "<br/>";
+                  }
+                  s+="</div> </div> </div><br><div>";
+
+                  s+="<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:200px;' onclick='cancellaPiatto(" + j + ");'> Cancella piatto dal menu </button> </div>";
+                  s+="<div style='float:right; padding-right: 2%'><button type='submit' class='btn btn-success btn-sm btn-icon' style='width:200px;' onclick='modificaPiatto(" + j + ");'> Modifica piatto </button> </div>";
+                  
+                  s+="<br>"; 
+                  s+="<hr>";
+                  controllo = 1;            
+                }
+
+              } // for
+            } // if
+          } // for
+
+          if (controllo==0) {
+            s+="<div class='alert alert-danger'> Nessun dolce in vendita :( </div>";
+          }
+
+          document.getElementById("vistaDolci").innerHTML = s;
+          return true;
+        }
+
+///////////////////////// AGGIUNGI AL MENU
+
+      function aggiungiPiattoAMenu(idmis) {
+
+        //var vpiatti = JSON.parse(localStorage.piatti);
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        var ristorante_loggato=0;
+
+        //cerco quale ristorante è loggato
+        for (var i=0; i<vristoranti.length; i++) {
+          if (vristoranti[i].l==1) {
+            ristorante_loggato = i;
+          }
+        }
+
+        for(p=0; p<vpiatti[idmis].ingredienti.length; p++) {
+          ingr.push(vpiatti[idmis].ingredienti[p]);
+        }
+
+        if (vristoranti[ristorante_loggato].menu.length == 0) { //se il menu è vuoto 
+
+          //creo un oggetto per salvare le info
+          var o = {
+            nome: vpiatti[idmis].nome,
+            categoria: vpiatti[idmis].categoria,
+            prezzo: vpiatti[idmis].prezzo,
+            foto: vpiatti[idmis].foto,
+            ingredienti:ingr
+          };
+
+          nextpos = vristoranti[ristorante_loggato].menu.length; //ultima posizione
+          vristoranti[ristorante_loggato].menu[nextpos] = o; //metto i dati nell'ultima posizione
+
+          alert("Modifica menu avvenuta con successo.");
+
+          //salvo i dati nel localStorage
+          localStorage.ristoranti = JSON.stringify(vristoranti);
+
+          window.location.href = "modificaMenu.html";
+          return false; //così non c'è refresh
+
+        } else {  //cerco se c'è già il piatto nel menu
+
+          for (var j=0; j<vristoranti[ristorante_loggato].menu.length; j++) {
+            if (vristoranti[ristorante_loggato].menu[j].nome == vpiatti[idmis].nome) {
+              alert("Piatto già inserito nel menu! Scegline un altro o torna al tuo account.");
+              return false;
+            }
+          } //for
+
+          //creo un oggetto per salvare le info
+          //var ingredienti = JSON.stringify(vpiatti[idmis].ingredienti)
+
+          var o = {
+            nome: vpiatti[idmis].nome,
+            categoria: vpiatti[idmis].categoria,
+            prezzo: vpiatti[idmis].prezzo,
+            foto: vpiatti[idmis].foto,
+            ingredienti:ingr
+          };
+
+          nextpos = vristoranti[ristorante_loggato].menu.length; //ultima posizione
+          vristoranti[ristorante_loggato].menu[nextpos] = o; //metto i dati nell'ultima posizione
+
+          alert("Modifica menu avvenuta con successo.");
+
+          //salvo i dati nel localStorage
+          localStorage.ristoranti = JSON.stringify(vristoranti);
+
+          window.location.href = "modificaMenu.html";
+          return false; //così non c'è refresh
+        }
+
+      } 
+
+///////////////////////// MODIFICA INGREDIENTI PIATTO
+
+      function modificaPiatto(numero) {
+          window.location.href = "modificaPiatto.html?"+numero;
+      }
+
+///////////////////////// CANCELLA PIATTO DAL MENU
+
+      function cancellaPiatto(numero){ 
+
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        var ristorante_loggato=0;
+
+        // cerco quale ristorante è loggato
+        for (i=0; i<vristoranti.length; i++) {
+          if (vristoranti[i].l==1) {
+            ristorante_loggato = i;
+          }
+        }
+
+        if (vristoranti[ristorante_loggato].menu.length != 0) { //se il menu è vuoto 
+          for (j=0; j<vristoranti[ristorante_loggato].menu.length; j++) {
+            if (vristoranti[ristorante_loggato].menu[j].nome == vristoranti[ristorante_loggato].menu[numero].nome) {
+              vristoranti[ristorante_loggato].menu.splice(j,1);
+              localStorage.ristoranti = JSON.stringify(vristoranti);
+
+              alert("Piatto è stato cancellato dal menu con successo!");
+              location.reload();
+            }
+          }
+        } 
+      }
+
+    </script>
+
+  </head>
+  <body onload="stampaPrimi(); stampaSecondi(); stampaContorni(); stampaPiattiUnici(); stampaDolci();  ">
+
+    <!-- NAVBAR -->    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" >
+      <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="../html/homeR.html">Home <span class="sr-only">(current)</span></a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+          </li>
+      </ul>
+      </div>
+    </nav>
+
+  </br>
+
+    <!-- CONTENT -->
+    <div class="container">
+      <div class="row">
+
+        <div class="col-md-6" >
+          <div style="padding:5px 20px; margin:0 auto;border: 2px #188a51 solid; overflow: auto;">
+          <center><img src='../img/componiMenu.png' style="width: 80%;"></center>
+          <p>Premi i bottoni per visualizzare la lista di piatti che puoi aggiungere al tuo menu.</p>
+    
+          <div class="btn-group">
+            <button onclick="stampaListaPiatti('Primo')">Primi</button>
+            <button onclick="stampaListaPiatti('Secondo')">Secondi</button>
+            <button onclick="stampaListaPiatti('Contorno')">Contorni</button>
+            <button onclick="stampaListaPiatti('Piatto unico')">Piatti unici</button>
+            <button onclick="stampaListaPiatti('Dolce')">Dolci</button>
+          </div>
+
+          <div id="listaPiatti"></div></br>
+          <button onclick="location.href='homeR.html';" class="btn btn-danger"><span class="glyphicon glyphicon-chevron-left"></span> Annulla e torna indietro</button>      
+          </div>
+        </div> <!-- <div class="col-md-6"> -->
+    
+        <div class="col-md-6">
+          <div class="panel panel-default" id="fissato" style=" padding:5px;margin:0 auto;border: 2px #188a51 solid;">
+            
+            <center><img src="../img/menu.png"></center>
+            <center><img src="../img/primi.png"></br></center>
+            <div id="vistaPrimi" style="padding: 2% 2%;"></div>
+            </br><center><img src="../img/secondi.png"></center></br>
+            <div id="vistaSecondi" style="padding: 2% 2%;"></div>
+            </br><center><img src="../img/contorni.png"></center></br>
+            <div id="vistaContorni" style="padding: 2% 2%;"></div>
+            </br><center><img src="../img/piattiUnici.png"></center></br>
+            <div id="vistaPiattiUnici" style="padding: 2% 2%;"></div>
+            </br><center><img src="../img/dolci.png"></center></br>
+            <div id="vistaDolci" style="padding: 2% 2%;"></div>
+          
+          </div> <!-- <div class="panel-default"> -->
+        </div> <!-- <div class="col-md-6"> -->
+
+      </div> <!-- <div class="row"> -->
+    </div> <!-- <div class="container"> -->
+
+    </br></br>
+  </body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        
+        <!-- Per il funzionamento dell'accordion -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css" rel="stylesheet"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+        
+        <!-- titolo e logo della pagina -->
+        <title>All in Green</title>
+        <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+        <script type="text/javascript">
+
+            var idris; //salvo id del ristorante
+
+    //SELEZIONE DEL RISTORANTE
+
+            function getFromUrl() {
+                var url, v;
+                url = document.location.href;
+                v = url.split("?");
+                stampaDatiRistorante(v[1]);
+            }
+
+
+    //STAMPA DATI E MENU DEL RISTORANTE SELEZIONATO
+
+            function stampaDatiRistorante(a){
+                //se il menu è vuoto
+                if (stampa==""){
+                    stampa="<br><div class='alert alert-danger'><center>Ordine vuoto!</center></div>";
+                    document.getElementById("formRiepilogo").innerHTML = stampa;
+                    stampa="";
+                }
+
+                //se invece ci sono dei piatti nel menu
+                idris=a;
+                //caricamento dati dal localStorage
+                var vristoranti = JSON.parse(localStorage.ristoranti);
+                var vutenti = JSON.parse(localStorage.utenti);
+
+                //stampo i dati del ristorante
+                var s = new String(""); 
+                s+="<strong>Nome</strong>: "+vristoranti[idris].nome+"<br>";
+                s+="<strong>Tipologia</strong>: "+vristoranti[idris].tipo+"<br>";
+                s+="<strong>Indirizzo</strong>: "+vristoranti[idris].indirizzo+", "+vristoranti[idris].citta+", "+vristoranti[idris].cap+"<br>"
+                s+="<strong>Contatti</strong>: "+vristoranti[idris].e+" - "+vristoranti[idris].telefono+"<br>";
+                s+="<div id='accordion'>"; 
+                s+="<br><div style='width: 100%; border: 2px green solid; border-radius: 5px;'>";
+                    s+="<div class='collapsed card-header'>";
+                        s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseSix'>";
+                            s+="<div style='color: #188a51; text-align:center;'><strong>Recensioni<img src='../img/espandiElenco.png' style='width:4%;' align=right></strong></div>";
+                        s+="</a>";
+                    s+="</div>"; 
+                    s+="<div id='collapseSix' class='collapse'>";
+                        s+="<div class='card-body'>";
+                            if (vristoranti[idris].recensioni.length == 0) {
+                                s+="Non ci sono ancora recensioni per questo ristorante!"
+                            }
+                            for(i=0; i<vristoranti[idris].recensioni.length; i++) {
+                                if (i==0) {
+                                    s+="<strong>Titolo: "+vristoranti[idris].recensioni[i].titolo+"</strong></br>";
+                                } else {
+                                    s+="<hr><strong>Titolo: "+vristoranti[idris].recensioni[i].titolo+"</strong></br>";
+                                }
+                                s+="Valutazione: "
+                                for (j=0; j<vristoranti[idris].recensioni[i].valutazione; j++) {
+                                    s+="<img src='../img/stella.png' style='width:4%;'>";
+
+                                }
+                                s+="<br>Commento: "+vristoranti[idris].recensioni[i].commento+"</br>";
+                                s+="<small>Scritto da "+vristoranti[idris].recensioni[i].nome+"</small>";
+                            }
+                s+="</div></div></div><br><br>";
+
+                document.getElementById("vistaDatiRistorante").innerHTML = s;
+            
+                //stampo del menu del ristorante
+                var controllo = 0;              //0 quando il menu è vuoto
+                var controlloPrimi = 0;         //0 quando non ci sono primi etc
+                var controlloSecondi = 0; 
+                var controlloContorni = 0; 
+                var controlloPiattiUnici = 0; 
+                var controlloDolci = 0; 
+
+                var primi = new String("");     //per la stampa dei primi etc
+                var secondi = new String("");
+                var contorni = new String("");
+                var piattiUnici = new String("");
+                var dolci = new String("");
+                var m = new String("");         //per la stampa delle categorie NON vuote
+
+                //form di ricerca per nome del piatto
+                m+="<div id='formRicercaNome'>";
+                    m+="<div class='row'>";
+                        m+="<div class='col-md-8'>";
+                            m+="<div class='form-group'><input style='border: green solid' type='text' placeholder='Cerca un piatto' id='nomepiatto' value='' class='form-control'></div>";
+                        m+="</div>";
+                        m+="<div class='col-md-4'>";
+                            m+="<button type='button' class='btn btn-success' onClick='ricercaPiatto("+idris+")'>Cerca</button>";
+                            m+=" ";
+                            m+="<button type='button' class='btn btn-danger' onClick='svuotaRicercaPiatto()'>Annulla</button>";
+                        m+="</div>";
+                    m+="</div>";
+                    m+="<div id='risultatoricerca'></div>";
+                m+="</div>";
+
+                //form di ricerca per prezzo del piatto
+                m+="<div id='formRicercaPrezzo'>";
+                    m+="<div class='row'>";
+                        m+="<div class='col-md-8'><div style='border: green solid; border-radius: 5px;' align=center>";
+                            m+="<strong>Filtra per prezzo</strong>";
+                            m+="<div class='form-check'><input class='form-check-input' type='radio' id='p1' name='ricercaPrezzo' value='sotto 5'>≤ 5€</div>";
+                            m+="<div class='form-check'><input class='form-check-input' type='radio' id='p2' name='ricercaPrezzo' value='oltre 5'>> 5€</div>";
+                        m+="</div></div>";
+                        m+="<div class='col-md-4'>";
+                            m+="<button type='button' class='btn btn-success' onClick='ricercaPiattoPrezzo("+idris+")'>Cerca</button>";
+                            m+=" ";
+                            m+="<button type='button' class='btn btn-danger' onClick='svuotaRicercaPiattoPrezzo()'>Annulla</button>";
+                        m+="</div>";
+                    m+="</div>";
+                    m+="<div id='risultatoricercaprezzo'></div>";
+                m+="</div>";
+
+                //elenco dei piatti del ristorante
+                m+="<div id='elencoPiattiRistorante'>";
+                    m+="<br><div align=middle><img src='../img/piattiDelRistorante.png' style='width:50%;'></div><br>";
+
+                if (vristoranti[idris].menu.length != 0) {
+
+                    //stampa del nome della tipologia di piatto
+
+                    primi+="<div style='width: 100%; border: 2px #188a51 solid; border-radius: 5px;'>";
+                        primi+="<div class='collapsed card-header'>";
+                            primi+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseOne'>";
+                                primi+="<div style='color: #188a51;'><strong><center>Primi<img src='../img/espandiElenco.png' style='width:4%;' align=right></center></strong></div>";
+                            primi+="</a>";
+                        primi+="</div>"; 
+                        primi+="<div id='collapseOne' class='collapse'>";
+                            primi+="<div class='card-body'>";
+                    
+                    secondi+="<div style='width: 100%; border: 2px #188a51 solid; border-radius: 5px;'>";
+                        secondi+="<div class='collapsed card-header'>";
+                            secondi+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseTwo'>";
+                                secondi+="<div style='color: #188a51;'><strong><center>Secondi<img src='../img/espandiElenco.png' style='width:4%;' align=right></center></strong></div>";
+                            secondi+="</a>";
+                            secondi+="</div>"; 
+                            secondi+="<div id='collapseTwo' class='collapse'>";
+                                secondi+="<div class='card-body'>";                                  
+                    
+                    contorni+="<div style='width: 100%; border: 2px #188a51 solid; border-radius: 5px;'>";
+                        contorni+="<div class='collapsed card-header'>";
+                            contorni+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseThree'>";
+                                contorni+="<div style='color: #188a51;'><strong><center>Contorni<img src='../img/espandiElenco.png' style='width:4%;' align=right></center></strong></div>";
+                            contorni+="</a>";
+                            contorni+="</div>"; 
+                            contorni+="<div id='collapseThree' class='collapse'>";
+                                contorni+="<div class='card-body'>";
+                    
+                    piattiUnici+="<div style='width: 100%; border: 2px #188a51 solid; border-radius: 5px;'>";
+                        piattiUnici+="<div class='collapsed card-header'>";
+                            piattiUnici+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseFour'>";
+                                piattiUnici+="<div style='color: #188a51;'><strong><center>Piatti unici<img src='../img/espandiElenco.png' style='width:4%;' align=right></center></strong></div>";
+                            piattiUnici+="</a>";
+                            piattiUnici+="</div>"; 
+                            piattiUnici+="<div id='collapseFour' class='collapse'>";
+                                piattiUnici+="<div class='card-body'>";               
+                    
+                    dolci+="<div style='width: 100%; border: 2px #188a51 solid; border-radius: 5px;'>";
+                        dolci+="<div class='collapsed card-header'>";
+                            dolci+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseFive'>";
+                                dolci+="<div style='color: #188a51;'><strong><center>Dolci<img src='../img/espandiElenco.png' style='width:4%;' align=right></center></strong></div>";
+                            dolci+="</a>";
+                            dolci+="</div>"; 
+                            dolci+="<div id='collapseFive' class='collapse'>";
+                                dolci+="<div class='card-body'>";         
+                    
+                    //stampa del singolo piatto nella tipologia corretta
+
+                    for (j=0; j<vristoranti[idris].menu.length; j++) {
+                        if (vristoranti[idris].menu[j].categoria=="Primo") {
+                            if (controlloPrimi==0) {
+                                primi+="<div class='row'>"; //per non stampare uno spazio in più al primo piatto
+                            } else {
+                                primi+="<hr><div class='row'>";
+                            }
+                            primi+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                            primi+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                            primi+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                            primi+="</div>";
+                            
+                            primi+="<small>Ingredienti: ";
+                            for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                if (k==0) {
+                                    primi+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                } else {
+                                    primi+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                }
+                            }
+                            primi+="</small><br>";
+                            controlloPrimi+=1;
+                            
+                        } else if (vristoranti[idris].menu[j].categoria=="Secondo") {
+                            if (controlloSecondi==0) {
+                                secondi+="<div class='row'>"; //per non stampare uno spazio in più al primo piatto
+                            } else {
+                                secondi+="<hr><div class='row'>";
+                            }
+                            secondi+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                            secondi+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                            secondi+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                            secondi+="</div>";
+
+                            secondi+="<small>Ingredienti: ";
+                            for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                if (k==0) {
+                                    secondi+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                } else {
+                                    secondi+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                }
+                            }
+                            secondi+="</small><br>";
+                            controlloSecondi+=1;
+
+                        } else if (vristoranti[idris].menu[j].categoria=="Contorno") {
+                            if (controlloContorni==0) {
+                                contorni+="<div class='row'>"; //per non stampare uno spazio in più al primo piatto
+                            } else {
+                                contorni+="<hr><div class='row'>";
+                            }                            
+                            contorni+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                            contorni+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                            contorni+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                            contorni+="</div>";
+
+                            contorni+="<small>Ingredienti: ";
+                            for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                if (k==0) {
+                                    contorni+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                } else {
+                                    contorni+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                }
+                            }
+                            contorni+="</small><br>";
+                            controlloContorni+=1;
+
+                        } else if (vristoranti[idris].menu[j].categoria=="Piatto unico") {
+                            if (controlloPiattiUnici==0) {
+                                piattiUnici+="<div class='row'>"; //per non stampare uno spazio in più al primo piatto
+                            } else {
+                                piattiUnici+="<hr><div class='row'>";
+                            }                              
+                            piattiUnici+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                            piattiUnici+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                            piattiUnici+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                            piattiUnici+="</div>";
+
+                            piattiUnici+="<small>Ingredienti: ";
+                            for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                if (k==0) { 
+                                    piattiUnici+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                } else {
+                                    piattiUnici+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                }
+                            }
+                            piattiUnici+="</small><br>";
+                            controlloPiattiUnici+=1;
+
+                        } else if (vristoranti[idris].menu[j].categoria=="Dolce") {
+                            if (controlloDolci==0) {
+                                dolci+="<div class='row'>"; //per non stampare uno spazio in più al primo piatto
+                            } else {
+                                dolci+="<hr><div class='row'>";
+                            }                              
+                            dolci+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                            dolci+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                            dolci+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                            dolci+="</div>";
+
+                            dolci+="<small>Ingredienti: ";
+                            for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                if (k==0) {
+                                    dolci+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                } else {
+                                    dolci+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                }
+                            }
+                            dolci+="</small><br>";
+                            controlloDolci+=1;
+                        }
+                    } 
+                    controllo = 1; //cioè c'è almeno un piatto da stampare
+
+                    primi+="</div></div></div><br>";
+                    secondi+="</div></div></div><br>";
+                    contorni+="</div></div></div><br>";
+                    piattiUnici+="</div></div></div><br>";
+                    dolci+="</div></div></div><br>";
+                }
+
+                if (controllo==0) {
+                    //se nel menu del ristorante non ci sono piatti
+                    document.getElementById("vistaMenuRistorante").innerHTML = "<div class='alert alert-danger'><center>Nessun prodotto in vendita!</center></div>";
+                } else { 
+                    //se ci sono piatti nel menu del ristorante stampo solo le categorie con almeno un piatto
+                    if (controlloPrimi!=0) {
+                        m+=primi;
+                    }
+                    if (controlloSecondi!=0) {
+                        m+=secondi;
+                    }
+                    if (controlloContorni!=0) {
+                        m+=contorni;
+                    }
+                    if (controlloPiattiUnici!=0) {
+                        m+=piattiUnici;
+                    }
+                    if (controlloDolci!=0) {
+                        m+=dolci;
+                    }
+                    document.getElementById("vistaMenuRistorante").innerHTML = "<div id='accordion'>" + m + "</div></div>"; //doppio div per questo m+="<div id='elencoPiattiRistorante'>"; che serve per nascondere/mostrare il div quando faccio la ricerca
+                }
+                return true;
+            }
+
+
+    //RICERCA DEL PIATTO PER NOME
+
+            function svuotaRicercaPiatto() {
+                document.getElementById("risultatoricerca").innerHTML="";
+                document.getElementById("nomepiatto").value="";
+                //nascondi ricerca per prezzo e menu del ristorante
+                document.getElementById("formRicercaPrezzo").style.display="block";
+                document.getElementById("elencoPiattiRistorante").style.display="block";
+            }
+
+            function ricercaPiatto(idris) {
+                //controllo se l'utente ha inserito qualcosa nel campo nome                       
+                if (document.getElementById("nomepiatto").value=="") {
+                    return false;
+                } else {
+                    //nascondi ricerca per prezzo e menu del ristorante
+                    document.getElementById("formRicercaPrezzo").style.display="none";
+                    document.getElementById("elencoPiattiRistorante").style.display="none";
+
+                    //prendo il nome del piatto
+                    var nomePiattoRicerca = document.getElementById("nomepiatto").value;
+                    //lo metto in minuscolo
+                    nomePiattoRicerca = nomePiattoRicerca.toLowerCase();
+
+                    //creo la stringa per la stampa dei risultati della ricerca
+                    var stringaRisultati = new String("");
+                    stringaRisultati+="<div align=middle><img src='../img/risultatiRicercaNome.png' style='width:70%;'></div>";
+
+                    var countRisultati = 0;
+
+                    //caricamento dati dal localStorage
+                    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+                    //ciclo per la ricerca
+                    for (j=0; j<vristoranti[idris].menu.length; j++) {
+                        //prendo il nome del piatto del ristorante
+                        var nomePiattoRistorante = vristoranti[idris].menu[j].nome;
+                        //lo metto in minuscolo
+                        nomePiattoRistorante = nomePiattoRistorante.toLowerCase();
+                        //faccio la ricerca
+                        var ricercaParola = nomePiattoRistorante.match(nomePiattoRicerca);
+                        
+                        console.log(ricercaParola);
+                        if (ricercaParola != null) {
+                            if (nomePiattoRistorante==ricercaParola.input) { //match va a creare array e input contiene il risultato della ricerca
+                                if (countRisultati==0) {
+                                    stringaRisultati+="<br><div class='row'>";
+                                } else {
+                                    stringaRisultati+="<hr><div class='row'>";
+                                }
+                                stringaRisultati+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                                stringaRisultati+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                                stringaRisultati+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                                stringaRisultati+="</div>";
+                                
+                                stringaRisultati+="<small>Ingredienti: ";
+                                for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                    if (k==0) {
+                                        stringaRisultati+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                    } else {
+                                        stringaRisultati+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                    }
+                                }
+                                stringaRisultati+="</small><br>";
+                                countRisultati+=1;
+                            }
+                        }
+                    } 
+
+                    if (countRisultati==0) {
+                        stringaRisultati="<br><div class='alert alert-danger'><center>Nessun risultato trovato!</center></div>";
+                    }
+
+                    document.getElementById("risultatoricerca").innerHTML = stringaRisultati + "<br>";
+                }
+            }
+
+    //RICERCA DEL PIATTO PER PREZZO
+
+            function svuotaRicercaPiattoPrezzo() {
+                document.getElementById("risultatoricercaprezzo").innerHTML = "";
+                document.getElementById('p1').checked = false;
+                document.getElementById('p2').checked = false;
+                //nascondi ricerca per prezzo e menu del ristorante
+                document.getElementById("formRicercaNome").style.display="block";
+                document.getElementById("elencoPiattiRistorante").style.display="block";
+            }
+
+            function ricercaPiattoPrezzo(idris) {                
+                var valorePrezzo = 0.0;
+                var filtro = new String("");
+                if (document.getElementById('p1').checked) {    
+                    valorePrezzo = 5.0;
+                    filtro = "minore";
+                } else if (document.getElementById('p2').checked) {    
+                    valorePrezzo = 5.0;
+                    filtro = "maggiore";
+                }
+
+                if (valorePrezzo==0.0) {
+                    return false;
+                } else {
+                    //nascondi ricerca per prezzo e menu del ristorante
+                    document.getElementById("formRicercaNome").style.display="none";
+                    document.getElementById("elencoPiattiRistorante").style.display="none";
+
+                    //prendo il nome del piatto
+                    var stringaRisultati = new String("");
+                    stringaRisultati+="<div align=middle><img src='../img/risultatiRicercaPrezzo.png' style='width:74%;'></div>";
+                    var countRisultati = 0;
+
+                    //caricamento dati dal localStorage
+                    var vristoranti = JSON.parse(localStorage.ristoranti);
+
+                    //ciclo per la ricerca
+                    for (j=0; j<vristoranti[idris].menu.length; j++) {
+                        var prezzoPiatto = vristoranti[idris].menu[j].prezzo;
+                        console.log(prezzoPiatto);
+                        if (filtro == "minore") {
+                            if (prezzoPiatto<=5.0) {
+                                if (countRisultati==0) {
+                                    stringaRisultati+="<br><div class='row'>";
+                                } else {
+                                    stringaRisultati+="<hr><div class='row'>";
+                                }
+                                stringaRisultati+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                                stringaRisultati+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                                stringaRisultati+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                                stringaRisultati+="</div>";
+                                
+                                stringaRisultati+="<small>Ingredienti: ";
+                                for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                    if (k==0) {
+                                        stringaRisultati+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                    } else {
+                                        stringaRisultati+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                    }
+                                }
+                                stringaRisultati+="</small><br>";
+                                countRisultati+=1;
+                            }
+                        } else if (filtro == "maggiore") {
+                            if (prezzoPiatto>5.0) {
+                                if (countRisultati==0) {
+                                    stringaRisultati+="<br><div class='row'>";
+                                } else {
+                                    stringaRisultati+="<hr><div class='row'>";
+                                }
+                                stringaRisultati+="<div class='col-md-4'><strong>"+vristoranti[idris].menu[j].nome+"</strong></div>"
+                                stringaRisultati+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[j].prezzo+" euro</div>"
+                                stringaRisultati+="<div class='col-md-4' align='right'><button type='button' class='btn btn-success btn-sm' onClick='riepilogoOrdine("+idris+", "+j+")'>Aggiungi</button></div>";
+                                stringaRisultati+="</div>";
+                                
+                                stringaRisultati+="<small>Ingredienti: ";
+                                for (k=0; k<vristoranti[idris].menu[j].ingredienti.length; k++) {
+                                    if (k==0) {
+                                        stringaRisultati+=vristoranti[idris].menu[j].ingredienti[k]; //per non stampare la virgola al primo ingrediente
+                                    } else {
+                                        stringaRisultati+=", "+vristoranti[idris].menu[j].ingredienti[k];
+                                    }
+                                }
+                                stringaRisultati+="</small><br>";
+                                countRisultati+=1;
+                            } 
+                        }
+                    } 
+
+                    if (countRisultati==0) {
+                        stringaRisultati="<br><div class='alert alert-danger'><center>Nessun risultato trovato!</center></div>";
+                    }
+
+                    document.getElementById("risultatoricercaprezzo").innerHTML = stringaRisultati  + "<br>";
+                }
+            }
+                                    
+
+    //CALCOLO E STAMPA DEL RIEPILOGO ORDINE QUANDO + AGGIUNGO + PIATTI
+
+            var totaleOrdine = 0.0; //per il calcolo del totale
+            var piattiOrdine = new Array(); //per memorizzare tutti i piatti aggiunti all'ordine
+            var stampa = new String(""); //per la stampa del riepilogo dell'ordine
+
+            function riepilogoOrdine(idris, idpiatto) {  
+                var vristoranti = JSON.parse(localStorage.ristoranti);
+
+                console.log(typeof(vristoranti[idris].menu[idpiatto].prezzo));
+                //aggiorno il totale 
+                console.log(totaleOrdine, "+", vristoranti[idris].menu[idpiatto].prezzo); //stampa per la verifica in console
+                totaleOrdine+=vristoranti[idris].menu[idpiatto].prezzo;
+                console.log("risultato", totaleOrdine); //stampa per la verifica in console
+
+                //variabili con nome e quantita del piatto da aggiungere
+                var nomePiattoSelezionato = vristoranti[idris].menu[idpiatto].nome;
+                var quantitaPiattoSelezionato = 1;
+
+                //modificare l'array di piatti dell'ordine
+                if (piattiOrdine.length==0) { //se non ci sono ancora piatti salvati nell'array piattiOrdine
+                    var nuovoPiattoArray = new Array(); //per memorizzare nome in posizione 0 e quantità in posizione 1 del piatto
+                    nuovoPiattoArray[0] = nomePiattoSelezionato;
+                    nuovoPiattoArray[1] = 1;
+                    piattiOrdine.push(nuovoPiattoArray);
+
+                } else { //se ci sono già dei piatti salvati nell'array piattiOrdine
+
+                    var count = 0; //per controllare che il piatto non sia già nell'array piattiOrdine
+
+                    //se il piatto è nell'array piattiOrdine aggiorno la quantità
+                    for (i=0; i<piattiOrdine.length; i++) {
+                        if (piattiOrdine[i][0]==nomePiattoSelezionato) {
+                            piattiOrdine[i][1]+=1;
+                            count+=1;
+                            quantitaPiattoSelezionato=piattiOrdine[i][1]; //aggiorno la quantità
+                        }
+                    }
+
+                    //se il piatto NON è ancora nell'array piattiOrdine lo aggiungo
+                    if (count==0) {
+                        var nuovoPiattoArray = new Array(); //per memorizzare nome e quantità del piatto
+                        nuovoPiattoArray[0] = nomePiattoSelezionato;
+                        nuovoPiattoArray[1] = 1;
+                        piattiOrdine.push(nuovoPiattoArray);
+                    }
+                }
+
+                //ciclo per la stampa del riepilogo
+                var stampa = ""; 
+                for (j=0; j<piattiOrdine.length; j++) {
+                    var nomePS = piattiOrdine[j][0]; //PS = PiattoSelezionato
+                    var quantitaPS = piattiOrdine[j][1];
+                    for (k=0; k<vristoranti[idris].menu.length; k++) { //ciclo tutti i piatti del menu per trovarne il prezzo
+                        if (vristoranti[idris].menu[k].nome==nomePS) {
+                            stampa+="<br><div class='row'>";
+                                stampa+="<div class='col-md-4' align='center'>"+nomePS+"</div>";
+                                stampa+="<div class='col-md-2' align='center'>"+quantitaPS+"</div>";
+                                stampa+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[k].prezzo+" euro</div>";
+                                stampa+="<div class='col-md-2' align='right'><button type='button' class='btn btn-danger btn-sm' onClick='rimuoviPiatto("+idris+", "+k+", "+j+")'>Rimuovi</button></div>";
+
+                            stampa+="</div>";
+                        }
+                    }                       
+                }
+
+                //ciclo stampa del metodo di pagamento dell'utente
+                var stampaMetodoPagamento = ""; 
+                var vutenti = JSON.parse(localStorage.utenti);
+                var utente_loggato=0;
+                //cerco quale utente è loggato
+                for (var i=0;i<vutenti.length;i++) {
+                    if (vutenti[i].l==1) {
+                        utente_loggato = i;
+                    }
+                }
+                stampaMetodoPagamento+="<h5>Metodo di pagamento</h5>";
+                if (vutenti[utente_loggato].pagamento=="carta di credito") {
+                    stampaMetodoPagamento+="Carta di credito";
+                    var numCarta = "";
+                    numCarta += vutenti[utente_loggato].numerocarta;
+                    var numCartaNascosto = "";
+                    for (i=0; i<(numCarta.length)-4; i++) {
+                        numCartaNascosto+="*";
+                    }
+                    numCartaNascosto+=numCarta[numCarta.length-4];
+                    numCartaNascosto+=numCarta[numCarta.length-3];
+                    numCartaNascosto+=numCarta[numCarta.length-2];
+                    numCartaNascosto+=numCarta[numCarta.length-1];
+                    stampaMetodoPagamento+=" ("+numCartaNascosto+")";
+                } else {
+                    stampaMetodoPagamento+="Pagamento alla consegna";
+                }
+
+                //ciclo per il metodo di consegna
+                var stampaMetodoConsegna = ""; 
+                stampaMetodoConsegna+="<h5>Scegli il metodo di consegna</h5>";
+                stampaMetodoConsegna+="<div class='form-check'><input class='form-check-input' type='radio' id='mc1' name='metodoConsegna' value='consegna a domicilio'>Consegna a domicilio ("+vutenti[utente_loggato].indirizzo+", "+vutenti[utente_loggato].citta+", "+vutenti[utente_loggato].cap+")";
+                stampaMetodoConsegna+="<br><small class='text-muted'>I costi per la consegna sono di 2€ per chilometro percorso.</small></div>";
+                stampaMetodoConsegna+="<div class='form-check'><input class='form-check-input' type='radio' id='mc2' name='metodoConsegna' value='ritiro presso il ristorante'>Ritiro presso il ristorante ("+vristoranti[idris].indirizzo+", "+vristoranti[idris].citta+", "+vristoranti[idris].cap+")</div>";
+
+                //inserisco tutto nella pagina
+                document.getElementById("formRiepilogo").innerHTML = "<br><div class='row'><div class='col-md-4'><h5 align='center'>Piatto</h5></div><div class='col-md-2'><h5 align='center'>Quantità</h5></div><div class='col-md-4'><h5 align='center'>Prezzo singolo</h5></div><div class='col-md-2'></div></div>"+stampa+"<hr><h5>Totale: "+totaleOrdine+" euro</h5><br>"+stampaMetodoPagamento+"<br><br>"+stampaMetodoConsegna+"<br><center><button type='button' class='btn btn-primary' onClick='confermaOrdine("+idris+")'>Conferma ordine</button></center><br><br>";
+            }
+
+
+    //CALCOLO E STAMPA DEL RIEPILOGO ORDINE QUANDO - RIMUOVO - PIATTI
+
+            function rimuoviPiatto(idris, idpiattoS, posizionePS) {
+                var vristoranti = JSON.parse(localStorage.ristoranti);
+
+                //trovo l'array nome, quantità del piatto selezionato nell'array piattiOrdine
+                var piattoSelezionatoArray = piattiOrdine[posizionePS];
+
+                //modifico le quantità
+                if (piattoSelezionatoArray[1] > 1) { //se c'è più di uno nella quantità scalo 
+                    piattoSelezionatoArray[1] = piattoSelezionatoArray[1]-1;
+                } else { //se la quantità è uno allora elimino il piatto
+                    piattiOrdine.splice(posizionePS, 1);
+                }
+
+                //aggiorno il totale
+                console.log(totaleOrdine, "-", vristoranti[idris].menu[idpiattoS].prezzo); //stampa per la verifica in console
+                totaleOrdine-=vristoranti[idris].menu[idpiattoS].prezzo;
+                console.log("risultato", totaleOrdine); //stampa per la verifica in console
+
+                //ciclo per la stampa
+                if (totaleOrdine==0.0) {
+                    stampa="<br><div class='alert alert-danger'><center>Ordine vuoto!</center></div>";
+                    document.getElementById("formRiepilogo").innerHTML = stampa;
+                } else {
+                    var stampa = ""; //per la stampa del riepilogo
+                    for (j=0; j<piattiOrdine.length; j++) {
+                        var nomePS = piattiOrdine[j][0]; //PS = PiattoSelezionato
+                        var quantitaPS = piattiOrdine[j][1];
+                        for (k=0; k<vristoranti[idris].menu.length; k++) { //ciclo tutti i piatti del menu per trovarne il prezzo
+                            if (vristoranti[idris].menu[k].nome==nomePS) {
+                                stampa+="<br><div class='row'>";
+                                    stampa+="<div class='col-md-4' align='center'>"+nomePS+"</div>";
+                                    stampa+="<div class='col-md-2' align='center'>"+quantitaPS+"</div>";
+                                    stampa+="<div class='col-md-4' align='center'>"+vristoranti[idris].menu[k].prezzo+" euro</div>";
+                                    stampa+="<div class='col-md-2' align='right'><button type='button' class='btn btn-danger btn-sm' onClick='rimuoviPiatto("+idris+", "+k+", "+j+")'>Rimuovi</button></div>";
+                                stampa+="</div>";
+                            }
+                        }                       
+                    }
+
+                    //ciclo stampa del metodo di pagamento dell'utente
+                    var stampaMetodoPagamento = ""; 
+                    var vutenti = JSON.parse(localStorage.utenti);
+                    var utente_loggato=0;
+                    //cerco quale utente è loggato
+                    for (var i=0;i<vutenti.length;i++) {
+                        if (vutenti[i].l==1) {
+                            utente_loggato = i;
+                        }
+                    }
+                    stampaMetodoPagamento+="<h5>Metodo di pagamento</h5>";
+                    if (vutenti[utente_loggato].pagamento=="carta di credito") {
+                        stampaMetodoPagamento+="Carta di credito";
+                        var numCarta = "";
+                        numCarta += vutenti[utente_loggato].numerocarta;
+                        var numCartaNascosto = "";
+                        for (i=0; i<(numCarta.length)-4; i++) {
+                            numCartaNascosto+="*";
+                        }
+                        numCartaNascosto+=numCarta[numCarta.length-4];
+                        numCartaNascosto+=numCarta[numCarta.length-3];
+                        numCartaNascosto+=numCarta[numCarta.length-2];
+                        numCartaNascosto+=numCarta[numCarta.length-1];
+                        stampaMetodoPagamento+=" ("+numCartaNascosto+")";
+                    } else {
+                        stampaMetodoPagamento+="Pagamento alla consegna";
+                    }
+                    
+                    //ciclo per il metodo di consegna
+                    var stampaMetodoConsegna = ""; 
+                    stampaMetodoConsegna+="<h5>Scegli il metodo di consegna</h5>";
+                    stampaMetodoConsegna+="<div class='form-check'><input class='form-check-input' type='radio' id='mc1' name='metodoConsegna' value='consegna a domicilio'>Consegna a domicilio ("+vutenti[utente_loggato].indirizzo+", "+vutenti[utente_loggato].citta+", "+vutenti[utente_loggato].cap+")";
+                    stampaMetodoConsegna+="<br><small class='text-muted'>I costi per la consegna sono di 2€ per chilometro percorso.</small></div>";
+                    stampaMetodoConsegna+="<div class='form-check'><input class='form-check-input' type='radio' id='mc2' name='metodoConsegna' value='ritiro presso il ristorante'>Ritiro presso il ristorante ("+vristoranti[idris].indirizzo+", "+vristoranti[idris].citta+", "+vristoranti[idris].cap+")</div>";
+
+                    document.getElementById("formRiepilogo").innerHTML = "<br><div class='row'><div class='col-md-4'><h5 align='center'>Piatto</h5></div><div class='col-md-2'><h5 align='center'>Quantità</h5></div><div class='col-md-4'><h5 align='center'>Prezzo singolo</h5></div><div class='col-md-2'></div></div>"+stampa+"<hr><h5>Totale: "+totaleOrdine+" euro</h5><br>"+stampaMetodoPagamento+"<br><br>"+stampaMetodoConsegna+"<br><center><button type='button' class='btn btn-primary' onClick='confermaOrdine("+idris+")'>Conferma ordine</button></center><br><br>";
+                }                
+            }
+
+
+    //CONFERMARE E SALVARE ORDINE
+
+            function confermaOrdine(idris) { 
+                                
+                var vristoranti = JSON.parse(localStorage.ristoranti);
+                var vutenti = JSON.parse(localStorage.utenti);
+                var utente_loggato = 0;
+
+                //cerco quale utente è loggato
+                for (var i=0; i<vutenti.length; i++) {
+                    if (vutenti[i].l == 1) {
+                        utente_loggato = i;
+                    }
+                }
+
+                var today = new Date();
+                var giorno = today.getDate();
+                var mese = today.getMonth() + 1;
+                var anno = today.getFullYear();
+                var ora = today.getHours();
+                var minuti = today.getMinutes();
+
+            //l'orario di apertura dei ristoranti è dalle 7 alle 23
+                var fuoriOrario = false;
+                if (ora < 7 || ora > 23) {
+                    fuoriOrario = true;
+                }
+
+                //calcolo il tempo di eleborazione dell'ordine
+                var tempoElaborazione = 0;
+               
+                //per gli ordini passati
+                for (j=0; j<vristoranti[idris].ordiniDaConfermare.length; j++) {
+                    var piattiOrdineDaConfermare = vristoranti[idris].ordiniDaConfermare[j].piattiOrdine;
+                    for (k=0; k<piattiOrdineDaConfermare.length; k++) {
+                        tempoElaborazione += 7*(piattiOrdineDaConfermare[k][1]);
+                    }
+                }
+
+                //per l'ordine corrente
+                for (a=0; a<piattiOrdine.length; a++) {
+                    tempoElaborazione += 7*(piattiOrdine[a][1]);
+                }
+
+                //valuto se la previsione di consegna/ritiro super l'orario di apertura del ristorante
+                var totaleMinuti = (ora*60);
+                totaleMinuti+=minuti;
+                totaleMinuti+=tempoElaborazione;
+                var calcoloOra = Math.floor(totaleMinuti/60);
+                if (calcoloOra < 7 || calcoloOra > 23) {
+                    fuoriOrario = true;
+                }
+
+                if (fuoriOrario==true) {
+                    alert("Il tuo ordine è fuori orario, riprova domani!"); 
+                    return false;
+                }
+
+                //recupero la scelta per il metodo di consegna
+                var metodoConsegna;
+                if (document.getElementById('mc1').checked) {    
+                    metodoConsegna = document.getElementById('mc1').value;
+                } else if (document.getElementById('mc2').checked) {    
+                    metodoConsegna = document.getElementById('mc2').value;
+                }
+                if (metodoConsegna==null) {
+                    alert("Devi scegliere un metodo di consegna per concludere l'ordine!");
+                    return false;
+                }
+
+
+                //salvo i dati per il ristorante
+                var invioPrenotazione = {
+                    giorno:giorno,
+                    mese:mese,
+                    anno:anno,
+                    ora:ora,
+                    minuti:minuti,
+                    piattiOrdine:piattiOrdine,
+                    emailCliente:vutenti[utente_loggato].nc,
+                    nomeCliente:vutenti[utente_loggato].nome,
+                    cognomeCliente:vutenti[utente_loggato].cognome,
+                    telefonoCliente:vutenti[utente_loggato].telefono,
+                    indirizzoCliente:vutenti[utente_loggato].indirizzo,
+                    cittaCliente:vutenti[utente_loggato].citta,
+                    capCliente:vutenti[utente_loggato].cap,
+                    metodoConsegnaCliente:metodoConsegna,
+                }
+                    
+                nextposOrdini = vristoranti[idris].ordiniDaConfermare.length; //ultima posizione
+                vristoranti[idris].ordiniDaConfermare[nextposOrdini] = invioPrenotazione; //metto i dati nell'ultima posizione
+
+                //salvo i dati nel localStorage
+                localStorage.ristoranti = JSON.stringify(vristoranti);
+
+                //salvo i dati per l'utente
+                var o = {
+                    giorno:giorno,
+                    mese:mese,
+                    anno:anno,
+                    ora:ora,
+                    minuti:minuti,
+                    ristorante:vristoranti[idris].e,
+                    piatti:piattiOrdine,
+                    totale:totaleOrdine,
+                    pagamento:vutenti[utente_loggato].pagamento,
+                    consegna:metodoConsegna,
+                    tempoelaborazione:tempoElaborazione,
+                };
+                nextpos = vutenti[utente_loggato].prenotazione.length; //ultima posizione
+                vutenti[utente_loggato].prenotazione[nextpos] = o; //metto i dati nell'ultima posizione
+
+                //salvo i dati nel localStorage
+                localStorage.utenti = JSON.stringify(vutenti);
+
+                if (metodoConsegna=="consegna a domicilio"){
+                    window.location.href = "mappa.html?"+idris;
+                    return false; //così non c'è refresh
+                } else if (metodoConsegna=="ritiro presso il ristorante") {
+                    alert("Ordine concluso con successo, sarà pronto al ristorante tra "+tempoElaborazione+" minuti!");
+                }
+                
+                window.location.href = "homeU.html";
+                return false; //così non c'è refresh
+            }
+
+        </script>
+    </head>
+
+    <body onload="getFromUrl();">
+
+        <!-- NAVBAR -->
+          
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">  <!-- bg-white per avere sfondo bianco -->
+            <a class="navbar-brand">
+                <img src="../img/logo.png" width="170" height="50" >
+            </a>
+    
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            
+                <li class="nav-item">
+                <a class="nav-link" href="../html/homeU.html">Home</a>
+                </li>
+    
+                <li class="nav-item active">
+                <a class="nav-link" href="../html/scegliRistoranteU.html">Ordina ora<span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+                  </li>
+            </ul>
+            </div>
+        </nav>
+
+        <!-- DATI -->
+
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="panel-body">
+                        <center><img src="../img/datiDelRistorante.png" width="380"></center><br>
+                        <div id="vistaDatiRistorante"></div>
+
+                        <center><img src="../img/menuDelRistorante.png" width="400"></center><br>
+                        <div id="vistaMenuRistorante"></div>
+                    </div><br>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="panel-body">
+                        <center><img src="../img/riepilogoOrdine.png" width="440"><br>
+                        <small class="text-muted">Il ristorante è aperto dalle ore 7 alle ore 23.</small></center>
+
+                        <div id="formRiepilogo"></div>                        
+                    </div> 
+                </div> 
+                
+            </div>
+        </div>
+
+    </body>
+</html>

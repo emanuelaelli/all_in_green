@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Per il funzionamento dell'accordion -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+      .menu {
+        padding-inline-start: 2%; 
+        padding-inline-end: 2%;
+      }
+      .profilo {
+        padding:1%;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+  //STAMPA DEI DATI DELL'UTENTE
+
+      function stampaDatiUtente() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+        var s = new String("");
+
+        //ciclo per trovare l'utente loggato
+        for (i=0; i<vutenti.length; i++) {
+          if (vutenti[i].l==1) {
+            s+="<div class='profilo'><strong style='color: #f47421;'>Email:</strong> "+vutenti[i].nc+"</div>";
+            s+="<div class='profilo'><strong style='color: #f47421;'>Password:</strong> ********"+"</div>";
+            s+="<div class='profilo'><strong style='color: #f47421;'>Nome e cognome:</strong> "+vutenti[i].nome+" "+vutenti[i].cognome+"</div>";
+            s+="<div class='profilo'><strong style='color: #f47421;'>Indirizzo:</strong> "+vutenti[i].indirizzo+", "+vutenti[i].citta+", "+vutenti[i].cap+"</div>";
+            s+="<div class='profilo'><strong style='color: #f47421;'>Telefono:</strong> "+vutenti[i].telefono+"</div>";
+            s+="<div class='profilo'><strong style='color: #f47421;'>Metodo di pagamento:</strong> "+vutenti[i].pagamento+"</div>";
+            
+            //stampa dati aggiuntivi solo per la carta di credito
+            if (vutenti[i].pagamento=="carta di credito") {
+              s+="<div class='profilo'><strong style='color: #f47421;'> &nbsp; ➔ &nbsp; Numero della carta:</strong> ";
+              for (j=0; j<(vutenti[i].numerocarta.length)-4; j++) {
+                 s+="*";
+              }
+              s+=vutenti[i].numerocarta[vutenti[i].numerocarta.length-4];
+              s+=vutenti[i].numerocarta[vutenti[i].numerocarta.length-3];
+              s+=vutenti[i].numerocarta[vutenti[i].numerocarta.length-2];
+              s+=vutenti[i].numerocarta[vutenti[i].numerocarta.length-1];
+              s+="</div>";
+
+              s+="<div class='profilo'><strong style='color: #f47421;'> &nbsp; ➔ &nbsp; Scadenza:</strong> "+vutenti[i].mesescadenza+" "+vutenti[i].annoscadenza+"</div>";
+              s+="<div class='profilo'><strong style='color: #f47421;'> &nbsp; ➔ &nbsp; CVV2:</strong> "+vutenti[i].cvv2+"</div>";
+            }
+            s+="<br>";
+            s+="<center><button type='submit' class='btn btn-light' style='background-color:#f47421; color: white;  width:100%;' onclick='modificaDati("+i+")'>Modifica i tuoi dati personali</button></center>";
+          }
+        }
+        document.getElementById("vistaDatiUtente").innerHTML = s;
+        return true;
+      }
+
+
+  //MODIFICA DEI DATI PERSONALI > vai alla pagina modificaDatiU
+
+      function modificaDati(i) {
+        window.location.href = "modificaDatiU.html?"+i;
+      }
+
+
+  //STAMPA DELLE PREFERENZE DELL'UTENTE
+
+      function stampaPreferenzeUtente() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+
+        //variabile per la stampa dei preferiti
+        var s = new String("");
+        s+="<div id='accordion'>"; 
+
+        var countPreferiti = 0;
+        var countFitfood = 0;
+        var countHamburgeria = 0;
+        var countCucinaOrientale = 0;
+
+        //ciclo per trovare l'utente loggato
+        for (i=0; i<vutenti.length; i++) {
+          if (vutenti[i].l==1) {
+
+            //ciclo per trovare i preferiti dell'utente
+
+            if (vutenti[i].fitfood=="1") {
+              s+="<br><div style='width: 100%; border: 2px #90c744 solid; border-radius: 5px;'>";
+                s+="<div class='collapsed card-header'>";
+                    s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseOne'>";
+                        s+="<div style='color: #90c744;'><strong>Fitfood<img src='../img/espandiElenco.png' style='width:4%;' align=right></strong></div>";
+                    s+="</a>";
+                s+="</div>"; 
+                s+="<div id='collapseOne' class='collapse'>";
+                    s+="<div class='card-body'>";
+
+              //cerco i ristoranti di questa tipologia  
+              for (j=0; j<vristoranti.length; j++) {
+                if (vristoranti[j].tipo == "fitfood") {
+                  if (countFitfood==0) { //se è il primo della lista non stampo hr
+                    s+="<strong>"+vristoranti[j].nome+"</strong><br>";
+                  } else {
+                    s+="<hr><strong>"+vristoranti[j].nome+"</strong><br>";
+                  }
+                  s+="<strong>Indirizzo</strong>: "+vristoranti[j].indirizzo+", "+vristoranti[j].citta+", "+vristoranti[j].cap+"<br>";
+                  s+="<div align='right'><button type='submit' class='btn btn-light btn-sm' style='background-color:#90c744' onclick='prenotaRistorante("+j+")'><span class='glyphicon glyphicon-calendar'></span>Ordina</button></div>";
+                  countFitfood+=1;
+                }                      
+              }
+              if (countFitfood==0) {
+                s+="Non ci sono ancora ristoranti per questa tipologia!";
+              }
+              s+="</div></div></div>";
+              countPreferiti=1;
+            }
+
+
+            if (vutenti[i].hamburgeria=="1") {
+              s+="<br><div style='width: 100%; border: 2px #90c744 solid; border-radius: 5px;'>";
+                s+="<div class='collapsed card-header'>";
+                    s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseTwo'>";
+                      s+="<div style='color: #90c744;'><strong>Hamburgeria<img src='../img/espandiElenco.png' style='width:4%;' align=right></strong></div>";
+                    s+="</a>";
+                s+="</div>"; 
+                s+="<div id='collapseTwo' class='collapse'>";
+                    s+="<div class='card-body'>";
+
+              //cerco i ristoranti di questa tipologia  
+              for (j=0; j<vristoranti.length; j++) {
+                if (vristoranti[j].tipo == "hamburgeria") {
+                  if (countHamburgeria==0) { //se è il primo della lista non stampo hr
+                    s+="<strong>"+vristoranti[j].nome+"</strong><br>";
+                  } else {
+                    s+="<hr><strong>"+vristoranti[j].nome+"</strong><br>";
+                  }
+                  s+="<strong>Indirizzo</strong>: "+vristoranti[j].indirizzo+", "+vristoranti[j].citta+", "+vristoranti[j].cap+"<br>";
+                  s+="<div align='right'><button type='submit' class='btn btn-light btn-sm' style='background-color:#90c744' onclick='prenotaRistorante("+j+")'><span class='glyphicon glyphicon-calendar'></span>Ordina</button></div>";
+                  countHamburgeria+=1;
+                }                      
+              }
+              if (countHamburgeria==0) {
+                s+="Non ci sono ancora ristoranti per questa tipologia!";
+              }
+              s+="</div></div></div>";
+              countPreferiti=1;
+            }
+
+
+            if (vutenti[i].cucinaorientale=="1") {
+              s+="<br><div style='width: 100%; border: 2px #90c744 solid; border-radius: 5px;'>";
+                s+="<div class='collapsed card-header'>";
+                    s+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapseThree'>";
+                      s+="<div style='color: #90c744;'><strong>Cucina orientale<img src='../img/espandiElenco.png' style='width:4%;' align=right></strong></div>";
+                    s+="</a>";
+                s+="</div>"; 
+                s+="<div id='collapseThree' class='collapse'>";
+                    s+="<div class='card-body'>";
+
+              //cerco i ristoranti di questa tipologia  
+              for (j=0; j<vristoranti.length; j++) {
+                if (vristoranti[j].tipo == "cucina orientale") {
+                  if (countCucinaOrientale==0) { //se è il primo della lista non stampo hr
+                    s+="<strong>"+vristoranti[j].nome+"</strong><br>";
+                  } else {
+                    s+="<hr><strong>"+vristoranti[j].nome+"</strong><br>";
+                  }                  
+                  s+="<strong>Indirizzo</strong>: "+vristoranti[j].indirizzo+", "+vristoranti[j].citta+", "+vristoranti[j].cap+"<br>";
+                  s+="<div align='right'><button type='submit' class='btn btn-light btn-sm' style='background-color:#90c744' onclick='prenotaRistorante("+j+")'><span class='glyphicon glyphicon-calendar'></span>Ordina</button></div>";
+                  countCucinaOrientale+=1;
+                }                      
+              }
+              if (countCucinaOrientale==0) {
+                s+="Non ci sono ancora ristoranti per questa tipologia!";
+              }
+              s+="</div></div></div>";
+              countPreferiti=1;
+            }
+
+
+            if (countPreferiti==0) {
+              s="<br><div class='alert alert-danger'><center>Non hai ancora scelto le tue preferenze!</center></div>";
+            } else {
+              //s+="</div>";
+            }
+            s+="<br><center><button type='submit' class='btn btn-light' style='background-color:#90c744;' onclick='modificaPreferenze("+i+")'>Modifica le tue preferenze</button></center>";
+          }
+        }
+        document.getElementById("vistaPreferenzeUtente").innerHTML = s;
+        return true;
+      }
+
+  //MODIFICA DELLE PREFERENZE > vai alla pagina modificaPreferenzeU
+
+      function modificaPreferenze(i) {
+        window.location.href = "modificaPreferenzeU.html?"+i;
+      }
+
+  
+  //STAMPA DEI SUGGERIMENTI IN BASE AI PIATTI ORDINATI RECENTEMENTE DALL'UTENTE
+
+      function stampaSuggerimentiUtente() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+
+        //variabili per la stampa dei suggerimenti
+        var s = new String("");        
+        var controllo = 0;
+
+        //ciclo per trovare l'utente loggato
+        for (i=0; i<vutenti.length; i++) { 
+
+          //trovato l'utente verifico che l'array delle prenotazioni non sia vuoto
+          if (vutenti[i].l == 1 && vutenti[i].prenotazione.length != 0) {
+
+            //salvo la posizione dell'ultima prenotazione e il corrispondente ristorante
+            var ultimaPrenotazione = vutenti[i].prenotazione.length;
+            ultimaPrenotazione = ultimaPrenotazione-1;
+            var ristoranteUltimaPrenotazione = vutenti[i].prenotazione[ultimaPrenotazione].ristorante;
+
+            s+="<div align=middle><img src='../img/suggeritiPerTe.png' style='width:50%;'></div><br>";
+            s+="<div style='color: #90c744;'><center>Ecco i piatti del tuo ultimo ordine.<br></center></div><br>";
+
+            //ciclo per visualizzare i piatti
+            for (k=0; k<vutenti[i].prenotazione[ultimaPrenotazione].piatti.length; k++) {
+
+              //salvo il nome del piatto 
+              var suggerimentoPiatto = vutenti[i].prenotazione[ultimaPrenotazione].piatti[k][0];
+
+
+              //ciclo per trovare il ristorate                
+              for (j=0; j<vristoranti.length; j++) {
+                if (vristoranti[j].e == ristoranteUltimaPrenotazione) {
+
+                  //cicla i piatti nel menu del ristorante
+                  for (x=0; x<vristoranti[j].menu.length; x++) {
+                    
+                    if (vristoranti[j].menu[x].nome == suggerimentoPiatto) {
+                      s+="<div class='card mb-3' style='max-width: 540px; border: #90c744 solid;'>";
+                        s+="<div class='row g-0'>";
+                          s+="<div class='col-md-4'>";
+                            s+="<img src='"+vristoranti[j].menu[x].foto+"'style='width:80%; position:relative; margin: 12px; float: left; border-radius: 5px;'>";
+                          s+="</div>";
+                          s+="<div class='col-md-8'>";
+                            s+="<div class='card-body'>";
+                              s+="<p class='card-text'>"+vristoranti[j].menu[x].nome+"<br><small class='text-muted'>(";
+                              for (a=0; a< vristoranti[j].menu[x].ingredienti.length; a++) {
+                                if (a==0) {
+                                  s+=vristoranti[j].menu[x].ingredienti[a];
+                                } else {
+                                  s+=", "+vristoranti[j].menu[x].ingredienti[a];
+                                }
+                              }
+                              s+=")</small></p>";  
+                            s+="</div>";
+                          s+="</div>";
+                        s+="</div>";
+                      s+="</div>";
+                    }
+
+                  }
+
+                }
+              }
+
+            }
+            s+="</div><br>";
+
+            s+="<div style='color: #90c744;'><center>Se ti sono piaciuti riordinali qui!<br></center></div><br>";
+
+            //alla funzione prenotaRistorante devo passare la posizione del ristorante in vristoranti e non la posizione del ristorante nell'array delle prenotazione
+            for (j=0; j<vristoranti.length; j++) {
+              if (vristoranti[j].e==ristoranteUltimaPrenotazione) {
+                s+="<center><button type='submit' class='btn btn-light btn-sm' style='background-color:#90c744;' onclick='prenotaRistorante("+j+")'>Ordina di nuovo</button></center><br>";
+              }
+            }
+            controllo=1;
+          } 
+        }
+        
+        if (controllo==0) {
+          s="";
+        }
+
+        document.getElementById("vistaSuggerimentiUtente").innerHTML = s;
+        return true;
+
+      }
+
+
+  //PRENOTA IL RISTORANTE SCELTO TRA QUELLI SUGGERITI
+
+        function prenotaRistorante(j) {
+          window.location.href="prenotazioneU.html?"+j;
+        }
+
+
+  //CANCELLARE ACCOUNT
+
+      function cancellaAccount() {
+
+        var richiesta = confirm("Vuoi cancellare il tuo account?");
+        if (richiesta == true) {
+          //caricamento dati dal localStorage
+          var vutenti = JSON.parse(localStorage.utenti);
+          //cerco utente loggato
+          for (var i=0; i<vutenti.length; i++) {
+            if (vutenti[i].l == 1) {
+              var nomeutente = new String(vutenti[i].nc);
+            }
+          }
+          // rimuovo i valori con splice()
+          for (var i = 0; i < vutenti.length; i++) {
+            if (vutenti[i].nc == nomeutente) {
+              vutenti.splice(i, 1); // splice (index, howmany)
+            }
+          }
+          // salvo i dati nel localStorage
+          localStorage.utenti = JSON.stringify(vutenti);
+          alert("Cancellazione account avvenuta con successo!");
+          window.location.href = "homepage.html";
+          return false;
+        }
+      }
+
+    //USCIRE DALL'ACCOUNT
+
+      function esciAccount() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+
+        for (i = 0; i < vutenti.length; i++) {
+          if (vutenti[i].l == 1) {
+            vutenti[i].l = 0;
+            localStorage.utenti = JSON.stringify(vutenti);
+            window.location.href = "homepage.html";
+            return true;
+          }
+        }
+      }
+
+    </script>
+
+  </head>
+
+  <body onload="stampaDatiUtente(); stampaPreferenzeUtente(); stampaSuggerimentiUtente();">
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+          <li class="nav-item">
+            <a class="nav-link active" href="../html/homeU.html">Home<span class="sr-only">(current)</span></a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/scegliRistoranteU.html">Ordina ora</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+
+    <!-- DATI -->
+
+    <div class="container">
+      <div class="row">
+
+        <!-- parte sx = preferenze e suggerimenti -->
+
+        <div class="col-md-6">        
+          <div class="panel-body">
+            <center><img src="../img/leTuePreferenze.png" width="330"></center>
+
+            <div id="vistaPreferenzeUtente"></div><br>
+
+            <div id="vistaSuggerimentiUtente"></div>
+          </div><br><br>
+        </div>
+
+        <!-- parte dx = dati e azioni -->
+
+        <div class="col-md-6">
+          <div class="panel-body">
+            <div class="menu">
+              <center><img src="../img/ilTuoProfiloU.png" width="350"></center><br>
+
+              <div id="vistaDatiUtente"></div>
+
+              <br><center><img src="../img/separatore.png" width="250"></center><br>  
+
+              <div class="row">
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-block btn-success" onclick="esciAccount();">Esci dall'account</button><br>
+                </div>
+                <div class="col-md-6">
+                  <button type="submit" class="btn btn-block btn-danger" onclick="cancellaAccount();">Cancella l'account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- row -->
+    </div> <!-- container -->
+  </body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    </head>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+      label {
+        color: #F47421;
+        font-size: large;
+        font-weight:bold;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+//////////////////////////// STAMPA ORDINI DA CONFERMARE
+
+    function stampaOrdiniDaConfermare() {
+      var s = new String("");
+      var vristoranti = JSON.parse(localStorage.ristoranti);
+      var ristorante_loggato=0;
+
+      // cerco quale utente è loggato
+      for (var i=0;i<vristoranti.length;i++) {
+          if (vristoranti[i].l==1) {
+              ristorante_loggato = i;
+          }
+      }
+
+      if (vristoranti[ristorante_loggato].ordiniDaConfermare.length == 0) {
+        s+="<div class='alert alert-danger'> Non è stato effettuato ancora nessun ordine :( </div>";
+      } else {
+        for(i=0; i<vristoranti[ristorante_loggato].ordiniDaConfermare.length; i++) {
+          s+= "<label>Ordine effettuato il</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].giorno + "/" 
+           + vristoranti[ristorante_loggato].ordiniDaConfermare[i].mese + "/" + vristoranti[ristorante_loggato].ordiniDaConfermare[i].anno 
+           + ", alle ore " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].ora;
+          if (vristoranti[ristorante_loggato].ordiniDaConfermare[i].minuti<10) {
+            s+=":0"+vristoranti[ristorante_loggato].ordiniDaConfermare[i].minuti + "</br>";
+          }else {
+            s+=":"+vristoranti[ristorante_loggato].ordiniDaConfermare[i].minuti + "</br>";
+          }
+
+          s+= "<label>Nome cliente:</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].nomeCliente + " " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].cognomeCliente + "</br>";
+          s+= "<label>Telefono cliente:</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].telefonoCliente + "</br>";
+          s+= "<label>Email cliente:</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].emailCliente + "</br>";
+          s+= "<label>Indirizzo di consegna:</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].indirizzoCliente + ", " 
+           + vristoranti[ristorante_loggato].ordiniDaConfermare[i].cittaCliente + " (" + vristoranti[ristorante_loggato].ordiniDaConfermare[i].capCliente + ") </br>";
+          s+= "<label>Tipologia di consegna:</label> " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].metodoConsegnaCliente + "</br>";
+          s+= "<label>Ordine:</label> </br>";
+
+          for (j=0; j<vristoranti[ristorante_loggato].ordiniDaConfermare[i].piattiOrdine.length; j++) { // stampo ordine cliente
+            s+= "&nbsp; • &nbsp;" + vristoranti[ristorante_loggato].ordiniDaConfermare[i].piattiOrdine[j][0] + " x " + vristoranti[ristorante_loggato].ordiniDaConfermare[i].piattiOrdine[j][1] + "</br>";
+          }
+
+          s+= "<div style='float:right'><button type='submit' class='btn btn-raised' style='color: #FFFFFF; background-color: #F8C100; width:100%; ' onclick='ordineEffettuato(" + i + ","+ ristorante_loggato +");'> Ordine effettuato </button></div>";
+          s+= "</br><hr>";
+        }
+      }
+
+      document.getElementById("ordiniDaConfermare").innerHTML = s;
+    }
+
+//////////////////////////// CANCELLO PIATTO DALLA LISTA DI ORDINI DA CONSEGNARE E LO METTO NELLA LISTA DEGLI ORDINI EFFETTUATI
+
+    function ordineEffettuato(numeroOrdine, ristoranteLoggato) {
+      var vristoranti = JSON.parse(localStorage.ristoranti);
+        
+      vristoranti[ristoranteLoggato].ordiniEffettuati.push(vristoranti[ristoranteLoggato].ordiniDaConfermare[numeroOrdine]); // aggiungo l'ordine alla lista degli ordinati
+      vristoranti[ristoranteLoggato].ordiniDaConfermare.splice(numeroOrdine,1); // elimino il piatto dagli ordini da effettuare
+
+      localStorage.ristoranti = JSON.stringify(vristoranti);
+
+      alert("Ordine effettuato con successo! Controlla se hai altri ordini da consegnare.");
+      location.reload();
+      return true;
+      
+    }
+
+    </script>
+
+</head>
+<body onload="stampaOrdiniDaConfermare();">
+
+    <!-- NAVBAR -->    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+    <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+    </a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="../html/homeR.html">Home</a>
+        </li>
+
+        <li class="nav-item">
+        <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+        </li>
+
+        <li class="nav-item active">
+            <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini<span class="sr-only">(current)</span></a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+        </li>
+    </ul>
+    </div>
+    </nav>
+
+  <!-- //////////////// CONTENT -->
+
+  <div class="container">
+    <center><img src="../img/confermaOrdini.png"></center><br>
+    <div id="ordiniDaConfermare"></div>
+
+  </div>
+    
+
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <style>
+        label.label {
+          color: #f69657;
+          font-size: large;
+          font-weight:bold;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+    //CARICA UTENTE 
+
+        var utente;
+
+        function getFromUrl() {
+            var url;
+            url = document.location.href;
+            utente = url.split("?");
+        }
+
+    //MODIFICA DEI DATI
+
+        function modificaDati(){
+
+            //caricamento dati dal localStorage
+            var vutenti = JSON.parse(localStorage.utenti);
+            posizione = utente[1];
+
+            for(i=0; i<vutenti.length; i++){
+                if (i != posizione) {
+                    if(vutenti[i].nc == document.modifica.email.value) {
+                        alert("ERRORE: questa email è già registrata, scegline un'altra!");
+                        return false;
+                    }
+                    if(vutenti[i].telefono == document.modifica.telefono.value) {
+                        alert("ERRORE: questo telefono è già registrato, scegline un altro!");
+                        return false;
+                    }
+                }
+            }
+
+            if (vutenti[posizione].nc == document.modifica.email.value) {
+                alert("ERRORE: questa è la tua vecchia email!");
+                return false;
+            } else if (document.modifica.email.value == "") {
+                vutenti[posizione].nc = vutenti[posizione].nc;
+            } else {
+                vutenti[posizione].nc = document.modifica.email.value;
+            }
+
+            if (vutenti[posizione].p == document.modifica.password.value) {
+                alert("ERRORE: questa è la tua vecchia password!");
+                return false;
+            } else if (document.modifica.password.value == "") {
+                vutenti[posizione].p = vutenti[posizione].p;
+            } else {
+                vutenti[posizione].p = document.modifica.password.value;
+            }
+
+            if (vutenti[posizione].nome == document.modifica.nome.value) {
+                alert("ERRORE: questo è il tuo vecchio nome!");
+                return false;
+            } else if (document.modifica.nome.value == "") {
+                vutenti[posizione].nome = vutenti[posizione].nome;
+            } else {
+                vutenti[posizione].nome = document.modifica.nome.value;
+            }
+
+            if (vutenti[posizione].cognome == document.modifica.cognome.value) {
+                alert("ERRORE: questo è il tuo vecchio cognome!");
+                return false;
+            } else if (document.modifica.cognome.value == "") {
+                vutenti[posizione].cognome = vutenti[posizione].cognome;
+            } else {
+                vutenti[posizione].cognome = document.modifica.cognome.value;
+            }
+
+            if (vutenti[posizione].indirizzo == document.modifica.indirizzo.value) {
+                alert("ERRORE: questo è il tuo vecchio indirizzo!");
+                return false;
+            } else if (document.modifica.indirizzo.value == "") {
+                vutenti[posizione].indirizzo = vutenti[posizione].indirizzo;
+            } else {
+                vutenti[posizione].indirizzo = document.modifica.indirizzo.value;
+            }
+
+            if (vutenti[posizione].citta == document.modifica.citta.value) {
+                alert("ERRORE: questa è la tua vecchia città!");
+                return false;
+            } else if (document.modifica.citta.value == "") {
+                vutenti[posizione].citta = vutenti[posizione].citta;
+            } else {
+                vutenti[posizione].citta = document.modifica.citta.value;
+            }
+
+            if (vutenti[posizione].cap == document.modifica.cap.value) {
+                alert("ERRORE: questo è il tuo vecchio cap!");
+                return false;
+            } else if (document.modifica.cap.value == "") {
+                vutenti[posizione].cap = vutenti[posizione].cap;
+            } else {
+                vutenti[posizione].cap = document.modifica.cap.value;
+            }
+
+            if (vutenti[posizione].telefono == document.modifica.telefono.value) {
+                alert("ERRORE: questo è il tuo vecchio telefono!");
+                return false;
+            } else if (document.modifica.telefono.value == "") {
+                vutenti[posizione].telefono = vutenti[posizione].telefono;
+            } else {
+                vutenti[posizione].telefono = document.modifica.telefono.value;
+            }
+
+            if (document.modifica.pagamento.value == "") { //nessuna modifica
+                vutenti[posizione].pagamento = vutenti[posizione].pagamento;
+            } else {
+                vutenti[posizione].pagamento = document.modifica.pagamento.value; //modifico il metodo di pagamento
+                
+                if (vutenti[posizione].pagamento == "pagamento alla consegna") { //quindi annullo i campi della carta di credito
+
+                    vutenti[posizione].numerocarta = ""; 
+                    vutenti[posizione].mesescadenza = "";
+                    vutenti[posizione].annoscadenza = "";
+                    vutenti[posizione].cvv2 = "";
+
+                } else if (vutenti[posizione].pagamento == "carta di credito") {
+
+                    if (document.modifica.numerocarta.value == "") { //se non viene inserito nulla
+                        if (vutenti[posizione].numerocarta == "") { //se non c'è ancora nessun dato di questo tipo errore...
+                            alert("ERRORE: se scegli questo metodo di pagamento devi compilare tutti i campi!");
+                            return false;
+                        } else { //... altrimenti lascio il vecchio dato
+                            vutenti[posizione].numerocarta = vutenti[posizione].numerocarta;
+                        }
+                    } else { //cambio il dato con quello appena inserito
+                        vutenti[posizione].numerocarta = document.modifica.numerocarta.value;
+                    }
+
+                    if (document.modifica.mesescadenza.value == "") {
+                        if (vutenti[posizione].mesescadenza == "") {
+                            alert("ERRORE: se scegli questo metodo di pagamento devi compilare tutti i campi!");
+                            return false;
+                        } else {
+                            vutenti[posizione].mesescadenza = vutenti[posizione].mesescadenza;
+                        }
+                    } else {
+                        vutenti[posizione].mesescadenza = document.modifica.mesescadenza.value;
+                    }
+
+                    if (document.modifica.annoscadenza.value == "") {
+                        if (vutenti[posizione].annoscadenza == "") {
+                            alert("ERRORE: se scegli questo metodo di pagamento devi compilare tutti i campi!");
+                            return false;
+                        } else {
+                            vutenti[posizione].annoscadenza = vutenti[posizione].annoscadenza;
+                        }
+                    } else {
+                        vutenti[posizione].annoscadenza = document.modifica.annoscadenza.value;
+                    }
+
+                    if (document.modifica.cvv2.value == "") {
+                        if (vutenti[posizione].cvv2 == "") {
+                            alert("ERRORE: se scegli questo metodo di pagamento devi compilare tutti i campi!");
+                            return false;
+                        } else {
+                            vutenti[posizione].cvv2 = vutenti[posizione].cvv2;
+                        }
+                    } else {
+                        vutenti[posizione].cvv2 = document.modifica.cvv2.value;
+                    }
+                }
+            }
+
+            //salvo i dati nel localStorage
+            localStorage.utenti = JSON.stringify(vutenti);
+            alert("Cambio dati effettuato con successo!");
+            window.location.href = "homeU.html";
+            return false; //così non c'è refresh
+        }
+    </script>
+  </head>
+
+  <body onload="getFromUrl()">
+
+    <!-- NAVBAR -->
+          
+    <nav class="navbar navbar-expand-lg navbar-light bg-white"> 
+        <a class="navbar-brand">
+            <img src="../img/logo.png" width="170" height="50" >
+        </a>
+  
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+          
+            <li class="nav-item">
+              <a class="nav-link active" href="../html/homeU.html">Home<span class="sr-only">(current)</span></a>
+            </li>
+  
+            <li class="nav-item">
+              <a class="nav-link"  href="../html/scegliRistoranteU.html">Ordina ora</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+            </li>
+          </ul>
+        </div>
+    </nav>
+
+    <!-- FORM DI MODIFICA -->
+
+    <div class="container">
+
+        <center><img src="../img/modificaDatiPersonaliU.png"></center>
+            
+        <div class="panel-body">
+            <form method="post" name="modifica" onSubmit="return modificaDati();">
+        
+                <div class="form-group">
+                    <label class="label">Email:</label>
+                    <input class="form-control" type="email" name="email" maxlength="30" placeholder="La tua email">
+                </div>
+        
+                <div class="form-group">
+                    <label class="label">Password:</label>
+                    <input class="form-control" type="password" name="password" minlength="8" placeholder="La tua password">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Nome:</label>
+                    <input class="form-control" type="text" name="nome" placeholder="Il tuo nome">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Cognome:</label>
+                    <input class="form-control" type="text" name="cognome" placeholder="Il tuo cognome">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Indirizzo:</label>
+                    <input class="form-control" type="text" name="indirizzo" placeholder="Il tuo indirizzo">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Città:</label>
+                    <input class="form-control" type="text" name="citta" placeholder="La tua città">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">CAP:</label>
+                    <input class="form-control" type="text" name="cap" minlength="5" maxlength="5" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  placeholder="Il tuo CAP">
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Telefono:</label>
+                    <input class="form-control" type="text" name="telefono" minlength="3" maxlength="12" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  placeholder="Il tuo telefono">
+                </div>
+
+                <label class="label">Metodo di pagamento:</label>
+
+                <!-- metodo 1 = pagamento alla consegna -->
+                
+                <div class="form-check">
+                <input class="form-check-input" type="radio" name="pagamento" value="pagamento alla consegna">
+                <label class="form-check-label" for="exampleRadios2">
+                    Pagamento alla consegna
+                </label>
+                </div><br>
+
+                <!-- metodo 2 = carta di credito -->
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="pagamento" value="carta di credito">
+                    <label class="form-check-label" for="exampleRadios2">
+                        Carta di credito
+                    </label>
+                </div>
+
+                <div class="col-md-4"><div class="form-group">
+                    <br><label>Inserisci i dati della tua carta di credito</label>
+
+                    <br><br><label>Numero della carta</label>
+                    <input class="form-control" type="text" name="numerocarta" minlength="13" maxlength="16" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Il tuo numero di carta">
+
+                    <br><label>Data di scadenza</label><br>
+                    <label>Mese</label>
+                    <select title="Scegli una opzione" name="mesescadenza" >
+                        <option name="mesescadenza" value="" title="Scegli una opzione" data-content="Annulla <span class='reset-label'></span>"></option>
+                        <option name="mesescadenza" value="Gennaio">Gennaio</option>
+                        <option name="mesescadenza" value="Febbraio">Febbraio</option>
+                        <option name="mesescadenza" value="Marzo">Marzo</option>
+                        <option name="mesescadenza" value="Aprile">Aprile</option>
+                        <option name="mesescadenza" value="Maggio">Maggio</option>
+                        <option name="mesescadenza" value="Giugno">Giugno</option>
+                        <option name="mesescadenza" value="Luglio">Luglio</option>
+                        <option name="mesescadenza" value="Agosto">Agosto</option>
+                        <option name="mesescadenza" value="Settembre">Settembre</option>
+                        <option name="mesescadenza" value="Ottobre">Ottobre</option>
+                        <option name="mesescadenza" value="Novembre">Novembre</option>
+                        <option name="mesescadenza" value="Dicembre">Dicembre</option>
+                    </select>
+                        
+                    <label>Anno</label>
+                    <select title="Scegli una opzione" name="annoscadenza" >
+                        <option name="annoscadenza" value="" title="Scegli una opzione" data-content="Annulla <span class='reset-label'></span>"></option>
+                        <option name="annoscadenza" value="2021">2021</option>
+                        <option name="annoscadenza" value="2022">2022</option>
+                        <option name="annoscadenza" value="2023">2023</option>
+                        <option name="annoscadenza" value="2024">2024</option>
+                        <option name="annoscadenza" value="2025">2025</option>
+                        <option name="annoscadenza" value="2026">2026</option>
+                    </select>
+
+                    <br><br><label>CVV2</label>
+                    <input class="form-control" type="text" name="cvv2" minlength="3" maxlength="4" onkeypress="return event.charCode >= 48 && event.charCode <= 57"  placeholder="Il tuo CVV2">
+                
+                </div></div>
+
+                <div class="form-group">
+                    <br><small>NB: i campi NON compilati non verranno modificati.</small><br><br>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <button type="submit" class="btn btn-block btn-success"><span class="glyphicon glyphicon-edit"></span> Modifica</button><br>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="reset" class="btn btn-primary" style="width: 100%;"><span class="glyphicon glyphicon-refresh"></span> Pulisci form</button><br>
+                        </div>
+                    </div>
+                </div>
+            </form>                    
+        </div> <!-- panel-body -->
+
+                
+        <button onclick="location.href='homeU.html';" class="btn btn-danger" style="width: 100%;"><span class="glyphicon glyphicon-chevron-left"></span> Annulla e torna indietro</button>
+        <br><br>
+
+    </div> <!-- container -->
+  </body>
+</html>

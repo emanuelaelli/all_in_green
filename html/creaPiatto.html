@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <!-- Per il funzionamento dell'accordion -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css" rel="stylesheet"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+        <!-- titolo e logo della pagina -->
+        <title>All in Green</title>
+        <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+        <script src="../json/ingredientiPiatti.json"></script>
+
+ <script type="text/javascript">
+
+///////////////////////////// AGGIUNGI PIATTO AL MENU DEL RISTORANTE 
+    function aggiungiNuovoPiatto() {
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        var ristorante_loggato=0;
+
+        // cerco quale utente è loggato
+        for (var i=0;i<vristoranti.length;i++) {
+            if (vristoranti[i].l==1) {
+                ristorante_loggato = i;
+            }
+        }
+
+        var nuovoPiatto = {
+          nome:document.aggiungi.nome.value,
+          categoria:document.aggiungi.categoria.value,
+          prezzo:parseFloat(document.aggiungi.prezzo.value),
+          foto: "../img/img_predefinita.png",
+          ingredienti: []
+        };
+
+        var checkboxes = document.getElementsByName("ingrediente");
+        for (i=0; i<checkboxes.length; i++) {
+            if (checkboxes[i].checked == true ) {
+                nuovoPiatto.ingredienti.push(checkboxes[i].value);
+            }
+        }
+
+        if (document.aggiungi.ingrediente1.value != "") {
+            nuovoPiatto.ingredienti.push(document.aggiungi.ingrediente1.value);
+        } 
+        if (document.aggiungi.ingrediente2.value != "") {
+            nuovoPiatto.ingredienti.push(document.aggiungi.ingrediente2.value);
+        }
+        if (document.aggiungi.ingrediente3.value != "") {
+            nuovoPiatto.ingredienti.push(document.aggiungi.ingrediente3.value);
+        }
+        if (document.aggiungi.ingrediente4.value != "") {
+            nuovoPiatto.ingredienti.push(document.aggiungi.ingrediente4.value);
+        }
+
+        if (nuovoPiatto.ingredienti.length==0){
+          alert("Devi aggiungere almeno un ingrediente al piatto!");
+          return false;
+        }
+
+        nextpos = vristoranti[ristorante_loggato].menu.length; // ultima posizione
+        vristoranti[ristorante_loggato].menu[nextpos] = nuovoPiatto; // metto i dati nell'ultima posizione
+
+        alert("Modifica menu avvenuta con successo.");
+
+        // salvo i dati nel localStorage
+        localStorage.ristoranti = JSON.stringify(vristoranti);
+
+        window.location.href = "homeR.html";
+        return false; // così non c'è refresh
+
+    }
+
+///////////////////////////// STAMPA FORM
+    function stampaForm() {
+        //caricamento ingredienti
+        var url = 'https://raw.githubusercontent.com/emanuelaelli/all_in_green/main/ingredientiPiatti.json';
+        var req = new XMLHttpRequest();
+        req.overrideMimeType("application/json");
+        req.open('GET', url, true);
+        req.send();
+        req.onload  = function() {
+            var jsonResponse = JSON.parse(req.responseText);
+            //do something with jsonResponse
+            console.log(jsonResponse);
+            var vingredientiPiatti = JSON.parse(req.responseText);
+        
+            /*if (typeof(localStorage.ingredientiPiatti) == "undefined") {
+                localStorage.setItem("ingredientiPiatti", JSON.stringify(ingredientiPiatti));  
+            }
+
+            // caricamento dati dal localStorage
+            var vingredientiPiatti = JSON.parse(localStorage.getItem("ingredientiPiatti"));*/
+                    
+            var form = new String("");
+
+            form+="<form action='' method='post' name='aggiungi' onSubmit='return aggiungiNuovoPiatto();'>";
+            form+="<div class='panel-body'>";
+            form+="<div class='panel-heading'>";
+            form+="<h2><center><img src='../img/aggiungiPiatto.png'></center></h2><br></div>";
+            form+="<div class='form-group' style='color:#D88148;'><strong>Nome piatto:</strong>";
+            form+="<input class='form-control' type='text' name='nome' maxlength='30' required=''></div>";
+            
+            form+="<div class='form-group' ><label style='color:#D88148;'><strong>Categoria:</strong></label></br>";
+            form+= "<input type='radio' name='categoria' value='Primo' required/> Primo </br>";
+            form+= "<input type='radio' name='categoria' value='Secondo' /> Secondo </br>";
+            form+= "<input type='radio' name='categoria' value='Contorno' /> Contorno </br>";
+            form+= "<input type='radio' name='categoria' value='Piatto unico' /> Piatto unico </br>";
+            form+= "<input type='radio' name='categoria' value='Dolce' /> Dolce </br></br> </div>";
+            
+            form+="<div class='form-group' style='color:#D88148;'><strong>Prezzo:</strong>";
+            form+="<input class='form-control' type='number' name='prezzo' required='' step='0.10' placeholder='0.00'></div>";
+            form+="<div class='form-group' >";
+            form+="<div style='color:#D88148;'><strong>Ingredienti:</strong> </div></br>";
+            
+            for (i=0; i<vingredientiPiatti.length; i++) {
+                form+="<div style='width: 100%; border: 1px #D88148 solid; ' >";
+                form+="<div class='collapsed card-header'>";
+                form+="<a class='card-link' data-toggle='collapse' data-parent='#accordion' href='#collapse"+i+"'>";
+                form+="<div style='color: #D88148; font-size: small;'><strong><center>";
+                form += "<strong>" + vingredientiPiatti[i].categoria + " </strong>";
+                form +="<img src='../img/espandiElenco.png' style='width:1.5%;' align=right></center></strong></div></a>";
+                form+="</div>"; 
+                    
+                form+="<div id='collapse"+i+"' class='collapse'>";
+                form+="<div class='card-body'>";
+                form += "<strong>" + vingredientiPiatti[i].categoria + ": </strong></br>";
+                for (j=0; j<vingredientiPiatti[i].elementi.length; j++) {
+                    form += "<input type='checkbox' name='ingrediente' value='" 
+                            + vingredientiPiatti[i].elementi[j] 
+                        + "' />  "+ vingredientiPiatti[i].elementi[j] + "</br>";
+                    
+                }
+                form+="</div> </div> </div><br><div>";
+            }
+            
+
+            form +="<div style='color:#D88148;'></br>Puoi aggiungere altri ingredienti a tuo piacimento: </div>";
+            form +="<input class='form-control' type='text' name='ingrediente1' placeholder='Aggiungi un ingrediente a tua scelta'></br>";
+            form +="<input class='form-control' type='text' name='ingrediente2' placeholder='Aggiungi un ingrediente a tua scelta'></br>";
+            form +="<input class='form-control' type='text' name='ingrediente3' placeholder='Aggiungi un ingrediente a tua scelta'></br>";
+            form +="<input class='form-control' type='text' name='ingrediente4' placeholder='Aggiungi un ingrediente a tua scelta'></br>";
+            form +="</div> </div> </div> ";
+
+            //BOTTONI MODIFICA E PULISCI
+            form +="<div class='row' style='margin-bottom: 2%;'><div class='col-md-8' >";
+            form +="<button type='submit' class='btn btn-block btn-success' style='width:90%; float: left;'><span class='glyphicon glyphicon-edit'></span> Modifica </button></div>";
+            form +="<div class='col-md-4' >";
+            form +="<button type='reset' class='btn btn-primary' style=' width:96%; float: right;'><span class='glyphicon glyphicon-refresh'></span> Pulisci form </button>";
+            form +="</div></div>";
+            form += "<div><center><button onclick='redirect();' class='btn btn-danger' style='padding:9px 300px;'> Annulla e torna alla modifica del menu. </button></center></div></div></form>";
+
+            document.getElementById("form").innerHTML = form;
+        };
+        
+
+    }
+
+    function redirect() {
+        window.location.href = 'homeR.html';
+        return false;
+    }
+
+
+ </script>
+</head>
+
+    <body onload="stampaForm()">
+
+        <!-- NAVBAR -->    
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+            <a class="navbar-brand">
+                <img src="../img/logo.png" width="170" height="50" >
+            </a>
+    
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarSupportedContent" >
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="../html/homeR.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+                </li>
+            </ul>
+            </div>
+        </nav>
+
+        <!-- CONTENT -->
+        <div class="container">
+            <div id="form"></div>
+        </div>
+        <br><br>
+   
+    </body>
+</html>

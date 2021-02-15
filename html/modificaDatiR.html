@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+      <!-- titolo e logo della pagina -->
+      <title>All in Green</title>
+      <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+      <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+      <style>
+        label.label {
+          color: #4E9CBD;
+          font-size: large;
+          font-weight:bold;
+        }
+      </style>
+
+    <script type="text/javascript">
+      var ristorante;
+      
+      //account ristorante
+
+      function getFromUrl() {
+        var url;
+        url = document.location.href;
+        ristorante = url.split("?");
+      }
+
+      //modifica dati
+          
+      function modificaDati(){
+
+        // caricamento dati dal localStorage
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        posizione = ristorante[1];
+
+        for(i=0;i<vristoranti.length;i++){
+          if (i != posizione) {
+            if(vristoranti[i].e==document.modifica.email.value) {
+              alert("ERRORE: questa email è già registrata, scegline un'altra!");
+              return false;
+            }
+            if(vristoranti[i].telefono==document.modifica.telefono.value) {
+              alert("ERRORE: questo telefono è già registrato, scegline un altro!");
+              return false;
+            }
+            if(vristoranti[i].iva==document.modifica.iva.value) {
+              alert("ERRORE: questa IVA è già registrata, scegline un'altra!");
+              return false;
+            }
+          }
+        }
+
+        if (vristoranti[posizione].e==document.modifica.email.value) {
+          alert("ERRORE: questa è la tua vecchia email!");
+          return false;
+        } else if (document.modifica.email.value == "") {
+          vristoranti[posizione].e = vristoranti[posizione].e;
+        } else {
+          vristoranti[posizione].e = document.modifica.email.value;
+        }
+
+        if (vristoranti[posizione].p==document.modifica.password.value) {
+          alert("ERRORE: questa è la tua vecchia password!");
+          return false;
+        } else if (document.modifica.password.value == "") {
+          vristoranti[posizione].p = vristoranti[posizione].p;
+        } else {
+          vristoranti[posizione].p = document.modifica.password.value;
+        }
+
+        if(vristoranti[posizione].nome==document.modifica.nome.value) {
+          alert("ERRORE: questo è il tuo vecchio nome!");
+          return false;
+        } else if (document.modifica.nome.value == "") {
+          vristoranti[posizione].nome = vristoranti[posizione].nome;
+        } else {
+          vristoranti[posizione].nome = document.modifica.nome.value;
+        }
+
+        if (document.modifica.tipo.value == "") {
+          vristoranti[posizione].tipo = vristoranti[posizione].tipo;
+        } else {
+          vristoranti[posizione].tipo = document.modifica.tipo.value;
+        }
+
+        if(vristoranti[posizione].telefono==document.modifica.telefono.value) {
+          alert("ERRORE: questo è il tuo vecchio telefono!");
+          return false;
+        } else if (document.modifica.telefono.value == "") {
+          vristoranti[posizione].telefono = vristoranti[posizione].telefono;
+        } else {
+          vristoranti[posizione].telefono = document.modifica.telefono.value;
+        }
+
+        if(vristoranti[posizione].iva==document.modifica.iva.value) {
+          alert("ERRORE: questa è la tua vecchia IVA!");
+          return false;
+        } else if (document.modifica.iva.value == "") {
+          vristoranti[posizione].iva = vristoranti[posizione].iva;
+        } else {
+          vristoranti[posizione].iva = document.modifica.iva.value;
+        }
+
+        if(vristoranti[posizione].indirizzo==document.modifica.indirizzo.value) {
+          alert("ERRORE: questo è il tuo vecchio indirizzo!");
+          return false;
+        } else if (document.modifica.indirizzo.value == "") {
+          vristoranti[posizione].indirizzo = vristoranti[posizione].indirizzo;
+        } else {
+          vristoranti[posizione].indirizzo = document.modifica.indirizzo.value;
+        }
+
+        if(vristoranti[posizione].citta==document.modifica.citta.value) {
+          alert("ERRORE: questa è la tua vecchia città!");
+          return false;
+        } else if (document.modifica.citta.value == "") {
+          vristoranti[posizione].citta = vristoranti[posizione].citta;
+        } else {
+          vristoranti[posizione].citta = document.modifica.citta.value;
+        }
+
+        if(vristoranti[posizione].cap==document.modifica.cap.value) {
+          alert("ERRORE: questo è il tuo vecchio CAP!");
+          return false;
+        } else if (document.modifica.cap.value == "") {
+          vristoranti[posizione].cap = vristoranti[posizione].cap;
+        } else {
+          vristoranti[posizione].cap = document.modifica.cap.value;
+        }
+
+        // salvo i dati nel localStorage
+        localStorage.ristoranti = JSON.stringify(vristoranti);
+
+        alert("Cambio dati effettuato con successo!");
+
+        window.location.href = "homeR.html";
+        return false; // così non c'è refresh
+      }
+
+    </script>
+  </head>
+
+  <body onload="getFromUrl()">
+
+    <!-- NAVBAR -->    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+          <a class="nav-link" href="../html/homeR.html">Home<span class="sr-only">(current)</span></a>
+          </li>
+
+          <li class="nav-item">
+          <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+          </li>
+
+          <li class="nav-item">
+          <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+          </li>
+      </ul>
+      </div>
+  </nav>
+
+    <!-- FORM DI MODIFICA -->
+
+    <div class="container">
+
+
+        <div class="panel panel-default">
+          
+          <center> <img src="../img/modificaDatiPersonali.png"> </center>
+
+          <div class="panel-body">
+            <form method="post" name="modifica" onSubmit="return modificaDati();">
+
+              <!-- EMAIL -->
+              <div class="form-group">
+                <label class="label">Email:</label>
+                <input class="form-control" type="email" name="email" maxlength="30" placeholder="La tua email" >
+              </div>
+
+              <!-- PASSWORD -->
+              <div class="form-group">
+                <label class="label">Password:</label>
+                <input class="form-control" type="password" minlength="8" name="password" placeholder="La tua password" >
+              </div>
+
+              <!-- NOME -->
+              <div class="form-group">
+                <label class="label">Nome:</label>
+                <input class="form-control" type="text" name="nome" minlength="5" placeholder="Il tuo nome" >
+              </div>
+
+              <!-- TIPO -->
+              <label class="label">Tipologia di ristorante:</label><br>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="tipo" value="fitfood">
+                <label class="form-check-label" for="exampleRadios2">
+                  Fitfood
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="tipo" value="hamburgeria">
+                <label class="form-check-label" for="exampleRadios2">
+                  Hamburgeria
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="tipo" value="cucina orientale">
+                <label class="form-check-label" for="exampleRadios2">
+                  Cucina orientale
+                </label>
+              </div><br>
+
+              <!-- TELEFONO -->
+              <div class="form-group">
+                <label class="label">Telefono:</label>
+                <input class="form-control" type="text" name="telefono" minlength="3" maxlength="12" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Il tuo telefono" >
+              </div>
+
+              <!-- IVA -->
+              <div class="form-group">
+                <label class="label">IVA:</label>
+                <input class="form-control" type="text" name="iva" minlength="5" maxlength="24" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="La tua IVA" >
+              </div>
+
+              <!-- INDIRIZZO -->
+              <div class="form-group">
+                <label class="label">Indirizzo:</label>
+                <input class="form-control" type="text" name="indirizzo" minlength="4" maxlength="24" placeholder="Il tuo indirizzo" >
+              </div>
+
+              <!-- CITTA -->
+              <div class="form-group">
+                <label class="label">Città:</label>
+                <input class="form-control" type="text" name="citta" minlength="3" maxlength="24" placeholder="La tua città" >
+              </div>
+
+              <!-- CAP -->
+              <div class="form-group">
+                <label class="label">CAP:</label>
+                <input class="form-control" type="text" name="cap" minlength="5" maxlength="5" size="5" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Il tuo CAP" >
+              </div>            
+
+              <!-- BOTTONI MODIFICA E PULISCI -->
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-8">
+                    <button type="submit" class="btn btn-block btn-success"><span class="glyphicon glyphicon-edit"></span> Modifica</button><br>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="reset" class="btn btn-primary" style="width: 100%;"><span class="glyphicon glyphicon-refresh"></span> Pulisci form</button><br>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div> 
+        </div> 
+        <button onclick="location.href='homeR.html';" class="btn btn-danger" style="width: 100%;"><span class="glyphicon glyphicon-chevron-left"></span> Annulla e torna indietro</button>
+        <br><br>
+
+  </body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <script type="text/javascript">
+
+  //CARICA UTENTE 
+
+      var utente;
+
+      function getFromUrl() {
+        var url;
+        url = document.location.href;
+        utente = url.split("?");
+      }
+
+
+  //CAMBIARE VALORE DELLA CHECKBOX ON CLICK
+
+      function cambiaValoreFitfood() {
+         document.modifica.fitfood.value="1";
+      }
+      
+      function cambiaValoreHamburgeria() {
+        document.modifica.hamburgeria.value="1";
+      }
+      
+      function cambiaValoreCucinaorientale() {
+        document.modifica.cucinaorientale.value="1";
+      }
+
+
+  //MODIFICA I DATI DELL'UTENTE
+
+      function modificaDati() {
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+        posizione = utente[1];
+
+        vutenti[posizione].fitfood = document.modifica.fitfood.value;
+        vutenti[posizione].hamburgeria = document.modifica.hamburgeria.value;
+        vutenti[posizione].cucinaorientale = document.modifica.cucinaorientale.value;
+
+        //salvo i dati nel localStorage
+        localStorage.utenti = JSON.stringify(vutenti);
+        
+        alert("Cambio dati effettuato con successo!");
+        window.location.href = "homeU.html";
+        return false; //così non c'è refresh
+      }
+
+    </script>
+  </head>
+
+  <body onload="getFromUrl()">
+
+    <!-- NAVBAR -->
+          
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  <!-- bg-white per avere sfondo bianco -->
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+  
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+          
+            <li class="nav-item">
+              <a class="nav-link active" href="../html/homeU.html">Home<span class="sr-only">(current)</span></a>
+            </li>
+  
+            <li class="nav-item">
+              <a class="nav-link"  href="../html/scegliRistoranteU.html">Ordina ora</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../html/ordiniU.html">Cronologia degli ordini</a>
+            </li>
+
+          </ul>
+        </div>
+    </nav>
+
+    <!-- FORM DI MODIFICA -->
+
+    <div class="container">
+      <center><img src="../img/modificaPreferenzeU.png" width="300"></center>
+
+          <div class="panel-body">
+            <form method="post" name="modifica" onSubmit="return modificaDati();">
+              
+              <div class="row" style="text-align: center;">
+
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <input type="checkbox" name="fitfood" value="0" onclick="cambiaValoreFitfood()">
+                    &nbsp;&nbsp;&nbsp;<img src="../img/porridge.jpg" style="width:45%; border-radius: 5px;">
+                    &nbsp;&nbsp;&nbsp;Fitfood
+                  </div>
+                </div><br>
+        
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <input type="checkbox" name="hamburgeria" value="0" onclick="cambiaValoreHamburgeria()">
+                    &nbsp;&nbsp;&nbsp;<img src="../img/hamburger.jpg" style="width:45%; border-radius: 5px;">
+                    &nbsp;&nbsp;&nbsp;Hamburgeria
+                  </div>
+                </div><br>
+
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <input type="checkbox" name="cucinaorientale" value="0" onclick="cambiaValoreCucinaorientale()">
+                    &nbsp;&nbsp;&nbsp;<img src="../img/oriente.jpg" style="width:45%; border-radius: 5px;">
+                    &nbsp;&nbsp;&nbsp;Cucina Orientale
+                  </div>
+                </div><br>
+
+              </div><br>
+
+              
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-3"></div>
+
+                  <div class="col-md-3" style="margin-right: 2%;">
+                    <button type="submit" class="btn btn-block btn-success" ><span class="glyphicon glyphicon-edit"></span> Modifica</button><br/>
+                  </div>
+
+                  <div class="col-md-3" style="margin-left: 2%;">
+                    <button type="reset" class="btn btn-block btn-primary" ><span class="glyphicon glyphicon-refresh"></span> Pulisci form</button><br>
+                  </div>
+                  
+                  <div class="col-md-3"></div>
+
+                </div>
+              </div>
+
+            </form>                    
+          </div> <!-- panel-body -->
+
+          <center><button onclick="location.href='homeU.html';" class="btn btn-block btn-danger"><span class="glyphicon glyphicon-chevron-left"></span> Annulla e torna indietro</button></center>
+          <br>
+
+        </div> <!-- col-md-5 -->
+      </div> <!-- row -->
+    </div> <!-- container -->
+  </body>
+</html>
+
+
+
+
+

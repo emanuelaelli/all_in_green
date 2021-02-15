@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <script src="../json/ingredientiPiatti.json"></script>
+    
+    <style>
+        label {
+          color: #9B1B1B;
+          font-size: large;
+          font-weight: bold;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+////////////////////// STAMPA TUTTE LE RECENSIONI
+
+      function stampaRecensioni() {
+        var s = new String("");
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        var ristorante_loggato=0;
+
+        //cerco quale ristorante è loggato
+        for (var i=0;i<vristoranti.length;i++) {
+          if (vristoranti[i].l==1) {
+            ristorante_loggato = i;
+          }
+        }
+
+        if (vristoranti[ristorante_loggato].recensioni.length == 0) {
+            s+="<div class='alert alert-danger'> Non hai ancora una recensione per il tuo ristorante!</div>";
+        } else {
+            
+            for(i=0; i<vristoranti[ristorante_loggato].recensioni.length; i++) {
+              if (i==0) {
+                s+= "<label>Nome e cognome:</label> " + vristoranti[ristorante_loggato].recensioni[i].nome + "  " + vristoranti[ristorante_loggato].recensioni[i].cognome + "</br>";
+              } else {
+                s+= "<hr><label>Nome e cognome:</label> " + vristoranti[ristorante_loggato].recensioni[i].nome + " " + vristoranti[ristorante_loggato].recensioni[i].cognome + "</br>";
+              }
+                s+= "<label>Valutazione:</label> ";
+                for (j=0; j<vristoranti[ristorante_loggato].recensioni[i].valutazione; j++) {
+                  s+=" <img src='../img/stella.png' style='width:1.5%;'>";
+                }
+                s+= "</br><label>Titolo:</label> " + vristoranti[ristorante_loggato].recensioni[i].titolo + "</br>";
+                s+= "<label>Commento:</label> " + vristoranti[ristorante_loggato].recensioni[i].commento + "</br>";
+                s+= "<div style='float:right'><button type='submit' class='btn btn-danger btn-sm btn-icon' style='width:100%;' onclick='cancellaRecensione(" + i + ");'> Cancella recensione dalla tua cronologia </button></div>";
+                s+= "<br>";
+            }
+            s+="<br>";
+        }
+
+      document.getElementById("recensioni").innerHTML = s;
+      }
+
+////////////////////// CANCELLA RECENSIONE DALL'ELENCO
+
+      function cancellaRecensione(numeroRecensione) {
+        var vristoranti = JSON.parse(localStorage.ristoranti);
+        var ristorante_loggato=0;
+
+        // cerco quale utente è loggato
+        for (var i=0;i<vristoranti.length;i++) {
+          if (vristoranti[i].l==1) {
+            ristorante_loggato = i;
+          }
+        }
+
+        vristoranti[ristorante_loggato].recensioni.splice(numeroRecensione,1);
+        localStorage.ristoranti = JSON.stringify(vristoranti);
+
+        alert("Cancellazione recensione avvenuta con successo!");
+        location.reload();
+      }
+
+    </script>
+
+  </head>
+
+  <body onload="stampaRecensioni();">
+
+    <!-- NAVBAR -->    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" >
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+            <a class="nav-link" href="../html/homeR.html">Home</a>
+            </li>
+
+            <li class="nav-item active">
+            <a class="nav-link" href="../html/viewRecensioniR.html">Recensioni <span class="sr-only">(current)</span></a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../html/confermaOrdiniR.html">Conferma gli ordini</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../html/statisticheR.html">Statistiche vendite</a>
+            </li>
+        </ul>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="container">
+        <center><img src="../img/recensioni.png" style="padding: 3%;"></center>
+        <div id="recensioni"></div><br>
+        <button type="submit" onclick="window.location.href='homeR.html'" class="btn btn-raised" style="color: #1f7518; background-color: #a0e9a0; width: 100%; float: right; font-weight: bold;" > Torna alla home </button>
+    </div>
+    <br><br><br>
+
+  </body>
+</html>

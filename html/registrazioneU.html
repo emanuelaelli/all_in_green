@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- titolo e logo della pagina -->
+    <title>All in Green</title>
+    <link rel="icon" href="../img/logo_piccolo.png" type="image/png" />
+
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS (servono per la navbar) -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <style>
+      label.label {
+        color: #f47421;
+        font-size: large;
+        font-weight:bold;
+      }
+    </style>
+
+    <script type="text/javascript">
+
+    //INIZIALIZZAZIONE DEL LOCAL STORAGE
+
+      function inizializzaStorageUtenti(){
+        if (typeof(localStorage.utenti) == "undefined") {
+          localStorage.utenti="[]";
+        }
+      }
+
+    //CONTROLLA E LOGIN
+
+      function checkLogin(){
+
+        //caricamento dati da localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+
+        for (i=0; i<vutenti.length; i++) {
+          if (vutenti[i].l==1) {
+            window.location.href = "homeU.html";
+          }
+        }
+      }
+
+    //SE EMAIL GIA REGISTRATA
+
+      function uguali(vutenti,datiform){
+        if (vutenti.nc==datiform.nc) {
+          return true;
+        }
+        return false;
+      }
+
+
+    //CAMBIA VALORI CHECKBOX
+
+    function cambiaValoreFitfood(){
+        document.registrazione.fitfood.value="1";
+      }
+      function cambiaValoreHamburgeria(){
+        document.registrazione.hamburgeria.value="1";
+      }
+      function cambiaValoreCucinaorientale(){
+        document.registrazione.cucinaorientale.value="1";
+      }
+
+
+    //REGISTRAZIONE DELL'UTENTE
+
+      function registrazioneUtente() {
+
+        //caricamento dati dal localStorage
+        var vutenti = JSON.parse(localStorage.utenti);
+
+        if (document.registrazione.pagamento.value==""){
+          alert("Devi scegliere un metodo di pagamento!");
+          return false;
+        }
+        
+        if (document.registrazione.pagamento.value=="carta di credito"){
+          if (document.registrazione.numerocarta.value==""){
+            alert("Se scegli questo metodo di pagamento devi compilare tutti i campi!");
+            return false;
+          } 
+          if (document.registrazione.mesescadenza.value==""){
+            alert("Se scegli questo metodo di pagamento devi compilare tutti i campi!");
+            return false;
+          } 
+          if (document.registrazione.annoscadenza.value==""){
+            alert("Se scegli questo metodo di pagamento devi compilare tutti i campi!");
+            return false;
+          }
+          if (document.registrazione.cvv2.value==""){
+            alert("Se scegli questo metodo di pagamento devi compilare tutti i campi!");
+            return false;
+          } 
+        } else {
+          document.registrazione.numerocarta.value="";
+          document.registrazione.mesescadenza.value="";
+          document.registrazione.annoscadenza.value="";
+          document.registrazione.cvv2.value="";
+        }
+
+        //registrare i dati del form
+        var datiform = {
+          l:1, //così quando l'utente si registra è automaticamente loggato
+          nc:document.registrazione.email.value,
+          p:document.registrazione.password.value,
+          nome:document.registrazione.nome.value,
+          cognome:document.registrazione.cognome.value,
+          indirizzo:document.registrazione.indirizzo.value,
+          citta:document.registrazione.citta.value,
+          cap:document.registrazione.cap.value,
+          telefono:document.registrazione.telefono.value,
+          fitfood:document.registrazione.fitfood.value,
+          hamburgeria:document.registrazione.hamburgeria.value,
+          cucinaorientale:document.registrazione.cucinaorientale.value,
+          pagamento:document.registrazione.pagamento.value,
+          numerocarta:document.registrazione.numerocarta.value,
+          mesescadenza:document.registrazione.mesescadenza.value,
+          annoscadenza:document.registrazione.annoscadenza.value,
+          cvv2:document.registrazione.cvv2.value,
+          prenotazione: []
+        };
+
+        //controllo se l'utente è già registrato
+        for (i=0;i<vutenti.length;i++) {
+          if(uguali(vutenti[i],datiform)) {
+            alert("Utente già registrato");
+            return false;
+          }
+        }
+
+        //aggiungo i dati nell'ultima posizione
+        vutenti[vutenti.length] = datiform;
+
+        //salvo i dati nel localStorage
+        localStorage.utenti = JSON.stringify(vutenti);
+
+        window.location.href = "homeU.html";
+
+        return true;
+      }
+    </script>
+
+  </head>
+
+  <body onload="inizializzaStorageUtenti(); checkLogin()">
+
+    <!-- NAVBAR -->
+            
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">  <!-- bg-white per avere sfondo bianco -->
+      <a class="navbar-brand">
+        <img src="../img/logo.png" width="170" height="50" >
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../html/homepage.html">Home</a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="../html/presentazione.html">Chi siamo</a>
+          </li>
+                      
+          <li class="nav-item dropdown active">
+            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Registrati qui!<span class="sr-only">(current)</span>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="../html/registrazioneU.html" style="color: #f47421;">Cliente</a>
+              <a class="dropdown-item" href="../html/registrazioneR.html" style="color: #4E9CBD;">Ristorante</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Accedi
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="../html/loginU.html" style="color: #f47421;">Cliente</a>
+              <a class="dropdown-item" href="../html/loginR.html" style="color: #4E9CBD;">Ristorante</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- REGISTRAZIONE UTENTE -->
+
+    <div class="container">
+      <form action="" method="post" name="registrazione" onSubmit="return registrazioneUtente();">
+
+        <div class="row">
+
+          <!-- DATI -->
+
+          <div class="col-md-6">
+            <div class="panel-body">
+
+              <div class="panel-heading">
+                <center><img src="../img/registratiPerOrdinare.png" width="500"></center>
+              </div>
+
+              <div class="panel-body">
+
+                <div class="form-group">
+                  <label class="label">Email:</label>
+                  <input class="form-control" type="email" name="email" maxlength="30" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Password:</label>
+                  <input class="form-control" type="password" name="password" minlength="8" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Nome:</label>
+                  <input class="form-control" type="text" name="nome" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Cognome:</label>
+                  <input class="form-control" type="text" name="cognome" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Indirizzo:</label>
+                  <input class="form-control" type="text" name="indirizzo" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Città:</label>
+                  <input class="form-control" type="text" name="citta" required="">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">CAP:</label>
+                  <input class="form-control" type="text" name="cap" minlength="5" maxlength="5" required="" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Telefono:</label>
+                  <input class="form-control" type="text" name="telefono" minlength="3" maxlength="12" required="" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                </div> 
+
+                <label class="label">Metodo di pagamento</label>*
+
+                <!-- metodo 1 = pagamento alla consegna -->
+                
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="pagamento" value="pagamento alla consegna">
+                  <label class="form-check-label" for="exampleRadios2">
+                    Pagamento alla consegna
+                  </label>
+                </div><br>
+
+                <!-- metodo 2 = carta di credito -->
+                
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="pagamento" value="carta di credito">
+                  <label class="form-check-label" for="exampleRadios2">
+                    Carta di credito
+                  </label>
+                </div>
+
+                <div class="col-md-8"><div class="form-group">
+                  <br><label>Inserisci i dati della tua carta di credito</label>
+                  <label>Numero della carta</label>
+                  <input class="form-control" type="text" name="numerocarta" minlength="13" maxlength="16" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+
+                  <br><label>Data di scadenza</label><br>
+                    <label>Mese</label>
+                    <select title="Scegli una opzione" name="mesescadenza" >
+                      <option name="mesescadenza" value="" title="Scegli una opzione" data-content="Annulla <span class='reset-label'></span>"></option>
+                      <option name="mesescadenza" value="Gennaio">Gennaio</option>
+                      <option name="mesescadenza" value="Febbraio">Febbraio</option>
+                      <option name="mesescadenza" value="Marzo">Marzo</option>
+                      <option name="mesescadenza" value="Aprile">Aprile</option>
+                      <option name="mesescadenza" value="Maggio">Maggio</option>
+                      <option name="mesescadenza" value="Giugno">Giugno</option>
+                      <option name="mesescadenza" value="Luglio">Luglio</option>
+                      <option name="mesescadenza" value="Agosto">Agosto</option>
+                      <option name="mesescadenza" value="Settembre">Settembre</option>
+                      <option name="mesescadenza" value="Ottobre">Ottobre</option>
+                      <option name="mesescadenza" value="Novembre">Novembre</option>
+                      <option name="mesescadenza" value="Dicembre">Dicembre</option>
+                    </select>
+                    
+                    <label>Anno</label>
+                    <select title="Scegli una opzione" name="annoscadenza" >
+                      <option name="annoscadenza" value="" title="Scegli una opzione" data-content="Annulla <span class='reset-label'></span>"></option>
+                      <option name="annoscadenza" value="2021">2021</option>
+                      <option name="annoscadenza" value="2022">2022</option>
+                      <option name="annoscadenza" value="2023">2023</option>
+                      <option name="annoscadenza" value="2024">2024</option>
+                      <option name="annoscadenza" value="2025">2025</option>
+                      <option name="annoscadenza" value="2026">2026</option>
+                    </select>
+
+                  <br><br><label>CVV2</label>
+                  <input class="form-control" type="text" name="cvv2" minlength="3" maxlength="4" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                
+                </div></div>
+                <small>* Potrai modificare questa scelta in qualunque momento.</small><br><br>
+                
+              </div>           
+            </div>
+          </div> 
+          
+          <!-- PREFERENZE -->
+
+          <div class="col-md-6">
+            <div class="panel-body">
+
+              <div class="panel-heading">
+                <center><img src="../img/scegliPreferenze.png" width="400"></center>
+              </div>
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <img src="../img/porridge.jpg" style="width:30%; border-radius: 5px;">
+                  &nbsp;&nbsp;&nbsp;Fitfood&nbsp;&nbsp;&nbsp;
+                  <input type="checkbox" name="fitfood" value="0" onclick="cambiaValoreFitfood()">
+                </div><br>
+
+                <div class="form-group">
+                  <img src="../img/hamburger.jpg" style="width:30%; border-radius: 5px;">
+                  &nbsp;&nbsp;&nbsp;Hamburgeria&nbsp;&nbsp;&nbsp;
+                  <input type="checkbox" name="hamburgeria" value="0" onclick="cambiaValoreHamburgeria()">
+                </div><br>
+
+                <div class="form-group">
+                  <img src="../img/oriente.jpg" style="width:30%; border-radius: 5px;">
+                  &nbsp;&nbsp;&nbsp;Cucina Orientale&nbsp;&nbsp;&nbsp;
+                  <input type="checkbox" name="cucinaorientale" value="0" onclick="cambiaValoreCucinaorientale()">
+                </div><br>
+              </div>           
+            </div>
+          </div> 
+        </div>  
+        
+        <!-- CONDIZIONI -->
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel-body">
+              <input type="checkbox" name="privacy" required=""><align="justify">  Ho letto l'informativa sulla Privacy e 
+              acconsento al trattamento dei miei dati personali per le finalità e con le modalità specificatamente indicate nell'informativa stessa.
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-2">
+                    <br>
+                    <button type="submit" class="btn btn-block btn-light" style="background-color:#f47421; color: white;">Registrati <span class="glyphicon glyphicon-user"></span><span class="glyphicon glyphicon-plus"></span></button><br>
+                  </div>
+                </div>
+              </div>
+              <a href="loginU.html"  style="color: #f47421;">Hai già un account? Accedi qui!</a><br><br>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </body>
+</html>
